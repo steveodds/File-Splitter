@@ -10,25 +10,20 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace P2P_File_Sharing
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for Store_File.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class Store_File : Window
     {
-        public MainWindow()
+        public Store_File()
         {
             InitializeComponent();
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Store_File store_File = new Store_File();
-            store_File.ShowDialog();
+            this.Left = Application.Current.MainWindow.Left + Application.Current.MainWindow.ActualWidth;
+            this.Top = Application.Current.MainWindow.Top;            
         }
     }
 }
