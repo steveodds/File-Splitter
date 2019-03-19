@@ -5,17 +5,37 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:P2P_File_Sharing"
         mc:Ignorable="d"
-        Title="P2P File Sharing" Height="463.6" Width="680.8" Background="#FF2B2B2B">
+        Title="P2P File Sharing" Height="463.6" Width="840" Background="#FF2B2B2B">
     <Grid>
-        <GroupBox Header="File Management" HorizontalAlignment="Left" Height="400" Margin="10,10,0,0" VerticalAlignment="Top" Width="310" Foreground="White" BorderBrush="#FF009FFF"/>
-        <GroupBox Header="Devices and info" Height="400" Margin="351,10,10.4,0" VerticalAlignment="Top" BorderBrush="#FF009FFF" Foreground="White"/>
+        <GroupBox Header="File Management" Height="400" Margin="10,10,0,0" VerticalAlignment="Top" Foreground="#FF8EFFA8" BorderBrush="#FF8EFFA8" HorizontalAlignment="Left" Width="315">
+            <Grid HorizontalAlignment="Left" Height="390" VerticalAlignment="Top" Width="300" Margin="0,0,-2.4,-11.6">
+                <Image HorizontalAlignment="Left" Height="104" Margin="173,65,0,0" VerticalAlignment="Top" Width="117"/>
+                <Image HorizontalAlignment="Left" Height="104" Margin="10,65,0,0" VerticalAlignment="Top" Width="117"/>
+                <Image HorizontalAlignment="Left" Height="104" Margin="173,230,0,0" VerticalAlignment="Top" Width="117"/>
+                <Image HorizontalAlignment="Left" Height="104" Margin="10,230,0,0" VerticalAlignment="Top" Width="117"/>
+                <Button Content="Store File" HorizontalAlignment="Left" Height="27" Margin="10,174,0,0" VerticalAlignment="Top" Width="117" Background="#00DDDDDD" Foreground="White" Style="{DynamicResource NoHoverColor}"/>
+                <Button Content="Leave Network" HorizontalAlignment="Left" Height="27" Margin="173,339,0,0" VerticalAlignment="Top" Width="117" Foreground="White" Background="#00DDDDDD" Style="{DynamicResource NoHoverColor}"/>
+                <Button Content="Retrieve All Files" HorizontalAlignment="Left" Height="27" Margin="10,339,0,0" VerticalAlignment="Top" Width="117" Background="#00DDDDDD" Foreground="White" Style="{DynamicResource NoHoverColor}"/>
+                <Button Content="Retrieve File" HorizontalAlignment="Left" Height="27" Margin="173,174,0,0" VerticalAlignment="Top" Width="117" Foreground="White" Background="#00DDDDDD" Style="{DynamicResource NoHoverColor}"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Devices and info" Height="400" Margin="349,10,10.4,0" VerticalAlignment="Top" BorderBrush="#FFFF8787" Foreground="#FFFF8787"/>
         <Label Content="Devices with fragments:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="364,34,0,0" Foreground="White"/>
         <Ellipse HorizontalAlignment="Left" Height="136" Stroke="#FF00C309" VerticalAlignment="Top" Width="136" Margin="364,65,0,0"/>
-        <Label Content="Device Pool:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="510,34,0,0" Foreground="White"/>
-        <Ellipse HorizontalAlignment="Left" Height="136" Stroke="#FF00B1C3" VerticalAlignment="Top" Width="136" Margin="510,65,0,0"/>
+        <Label Content="Device Pool:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="512,34,0,0" Foreground="White"/>
+        <Ellipse HorizontalAlignment="Left" Height="136" Stroke="#FF00B1C3" VerticalAlignment="Top" Width="136" Margin="512,65,0,0"/>
         <Label Content="0" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="84" Margin="397,91,0,0" VerticalAlignment="Top" Width="71" FontSize="48" FontWeight="Bold" Foreground="#FF00C309"/>
-        <Label Content="0" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="84" Margin="543,91,0,0" VerticalAlignment="Top" Width="71" FontSize="48" FontWeight="Bold" Foreground="#FF00B1C3"/>
-        <Label Content="Files in Storage:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="364,219,0,0" Foreground="White"/>
-
+        <Label Content="0" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="84" Margin="545,91,0,0" VerticalAlignment="Top" Width="71" FontSize="48" FontWeight="Bold" Foreground="#FF00B1C3"/>
+        <Label Content="Shared Network Space:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="364,219,0,0" Foreground="White"/>
+        <Label Content="Saved Files:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="659,34,0,0" Foreground="White"/>
+        <Ellipse HorizontalAlignment="Left" Height="136" Stroke="#FF0400A0" VerticalAlignment="Top" Width="136" Margin="659,65,0,0"/>
+        <Label Content="0" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="84" Margin="692,91,0,0" VerticalAlignment="Top" Width="71" FontSize="48" FontWeight="Bold" Foreground="#FF0400A0"/>
+        <ProgressBar HorizontalAlignment="Left" Height="16" Margin="364,250,0,0" VerticalAlignment="Top" Width="430" Minimum="0" Maximum="100" Value="50"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="(spaceLeft Left)" VerticalAlignment="Top" Foreground="Black" Margin="368,250,0,0" FontWeight="Bold"/>
+        <Label Content="Reserved Disk Space:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="364,283,0,0" Foreground="White"/>
+        <ProgressBar HorizontalAlignment="Left" Height="16" Margin="364,314,0,0" VerticalAlignment="Top" Width="430" Minimum="0" Maximum="100" Value="50"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="(spaceLeft Left)" VerticalAlignment="Top" Foreground="Black" Margin="368,314,0,0" FontWeight="Bold"/>
+        <Label Content="Activity:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="364,338,0,0" Foreground="White"/>
+        <TextBlock HorizontalAlignment="Left" Height="31" Margin="364,368,0,0" TextWrapping="Wrap" Text="No activity..." VerticalAlignment="Top" Width="433" Foreground="#FFB3B3B3"/>
     </Grid>
 </Window>
