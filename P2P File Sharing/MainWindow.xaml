@@ -5,8 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:P2P_File_Sharing"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="P2P File Sharing" Height="463.6" Width="680.8" Background="#FF2B2B2B">
     <Grid>
-        
+        <GroupBox Header="File Management" HorizontalAlignment="Left" Height="400" Margin="10,10,0,0" VerticalAlignment="Top" Width="310" Foreground="White" BorderBrush="#FF009FFF"/>
+        <GroupBox Header="Devices and info" Height="400" Margin="351,10,10.4,0" VerticalAlignment="Top" BorderBrush="#FF009FFF" Foreground="White"/>
+        <Label Content="Devices with fragments:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="364,34,0,0" Foreground="White"/>
+        <Ellipse HorizontalAlignment="Left" Height="136" Stroke="#FF00C309" VerticalAlignment="Top" Width="136" Margin="364,65,0,0"/>
+        <Label Content="Device Pool:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="510,34,0,0" Foreground="White"/>
+        <Ellipse HorizontalAlignment="Left" Height="136" Stroke="#FF00B1C3" VerticalAlignment="Top" Width="136" Margin="510,65,0,0"/>
+        <Label Content="0" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="84" Margin="397,91,0,0" VerticalAlignment="Top" Width="71" FontSize="48" FontWeight="Bold" Foreground="#FF00C309"/>
+        <Label Content="0" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="84" Margin="543,91,0,0" VerticalAlignment="Top" Width="71" FontSize="48" FontWeight="Bold" Foreground="#FF00B1C3"/>
+        <Label Content="Files in Storage:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="364,219,0,0" Foreground="White"/>
+
     </Grid>
 </Window>
