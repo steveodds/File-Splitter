@@ -36,6 +36,6 @@
         <ProgressBar x:Name="pbReservedDiskSpace" HorizontalAlignment="Left" Height="16" Margin="364,314,0,0" VerticalAlignment="Top" Width="430" Minimum="0" Maximum="100" Value="50" Foreground="#FF26A0DA"/>
         <TextBlock x:Name="tbReservedDiskSpaceLeft" HorizontalAlignment="Left" TextWrapping="Wrap" Text="(spaceLeft Left)" VerticalAlignment="Top" Foreground="Black" Margin="368,314,0,0" FontWeight="Bold"/>
         <Label Content="Activity:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="364,338,0,0" Foreground="White"/>
-        <TextBlock x:Name="tbAppActivity" HorizontalAlignment="Left" Height="31" Margin="364,368,0,0" TextWrapping="Wrap" Text="No activity..." VerticalAlignment="Top" Width="433" Foreground="#FFB3B3B3"/>
+        <TextBlock x:Name="tbAppActivity" HorizontalAlignment="Left" Height="31" Margin="364,368,0,0" TextWrapping="Wrap" Text="No activity..." VerticalAlignment="Top" Width="433" Foreground="#FFB3B3B3" x:FieldModifier="public"/>
     </Grid>
 </Window>

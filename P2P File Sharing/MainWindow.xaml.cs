@@ -20,9 +20,11 @@ namespace P2P_File_Sharing
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static MainWindow mainAppInstance;
         public MainWindow()
         {
             InitializeComponent();
+            mainAppInstance = this;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
