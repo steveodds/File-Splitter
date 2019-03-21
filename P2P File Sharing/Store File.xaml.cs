@@ -66,17 +66,27 @@ namespace P2P_File_Sharing
         public bool fileHash()
         {
             bool success = false;
-            postActivity("\nCalculating MD5 checksum...", 1);
-            using (var md5 = MD5.Create())
+            try
             {
-                using (var stream = File.OpenRead(pickedFile))
+                
+                postActivity("\nCalculating MD5 checksum...", 1);
+                using (var md5 = MD5.Create())
                 {
-                    var hash = md5.ComputeHash(stream);
-                    generatedHash = BitConverter.ToString(hash).Replace("-", "").ToLower();
-                    postActivity("\tSuccessfully generated hash.", 1);
-                    success = true;
+                    using (var stream = File.OpenRead(pickedFile))
+                    {
+                        var hash = md5.ComputeHash(stream);
+                        generatedHash = BitConverter.ToString(hash).Replace("-", "").ToLower();
+                        postActivity("\tSuccessfully generated hash.", 1);
+                        success = true;
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                postActivity("Error: " + ex.Message, 0);
+                throw ex;
+            }
+            
 
             return success;
         }
@@ -89,8 +99,7 @@ namespace P2P_File_Sharing
                 {
                     byte[] key = ASCIIEncoding.UTF8.GetBytes(skey);
 
-                    /* This is for demostrating purposes only. 
-                     * Ideally you will want the IV key to be different from your key and you should always generate a new one for each encryption in other to achieve maximum security*/
+                    
                     byte[] IV = ASCIIEncoding.UTF8.GetBytes(skey);
 
                     using (FileStream fsCrypt = new FileStream(outputFile, FileMode.Create))
@@ -128,8 +137,6 @@ namespace P2P_File_Sharing
                 FileInfo fi = new FileInfo(encFile);
                 using (FileStream inFile = fi.OpenRead())
                 {
-                    // Prevent compressing hidden and 
-                    // already compressed files.
                     if (fi.Extension != ".gz")
                     {
                         // Create the compressed file.
@@ -155,7 +162,7 @@ namespace P2P_File_Sharing
             {
                 isPostingActivityError(true);
                 postActivity("Failed to compress: " + ex.Message, 0);
-                throw;
+                throw ex;
             }
             
         }
@@ -257,6 +264,11 @@ namespace P2P_File_Sharing
             {
                 postActivity("Attempting to compress", 0);
                 fileZipper();
+            }
+            else
+            {
+                isPostingActivityError(true);
+                postActivity("Process Failed", 0);
             }
             
         }
