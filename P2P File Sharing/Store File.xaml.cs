@@ -15,6 +15,7 @@ using System.Security.Cryptography;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.IO.Compression;
+using Ionic.Zip;
 
 namespace P2P_File_Sharing
 {
@@ -134,36 +135,58 @@ namespace P2P_File_Sharing
         {
             try
             {
-                FileInfo fi = new FileInfo(encFile);
-                using (FileStream inFile = fi.OpenRead())
+                int segmentsCreated;
+                using (ZipFile zip = new ZipFile())
                 {
-                    if (fi.Extension != ".gz")
-                    {
-                        // Create the compressed file.
-                        using (FileStream outFile = File.Create(fi.FullName + ".gz"))
-                        {
-                            using (GZipStream Compress = new GZipStream(outFile, CompressionMode.Compress))
-                            {
-                                // Copy the source file into 
-                                // the compression stream.
-                                inFile.CopyTo(Compress);
+                    FileInfo fileInfo = new FileInfo(pickedFile);
+                    //zip.AlternateEncoding = ;  // utf-8
+                    string fileName = fileInfo.FullName.Substring(0, pickedFile.Length - fileInfo.Name.Length);
+                    zip.AddDirectory(fileName);
+                    zip.Comment = "This zip was created at " + System.DateTime.Now.ToString("G");
+                    zip.MaxOutputSegmentSize = 100 * 1024; // 100k segments
+                    zip.Save("MyFiles.zip");
 
-                                postActivity(String.Concat("Compressed ", fi.Name, " from ", fi.Length.ToString(), " to ", outFile.Length.ToString(), " bytes."), 0);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        postActivity("Already compressed", 0);
-                    }
+                    segmentsCreated = zip.NumberOfSegmentsForMostRecentSave;
                 }
             }
             catch (Exception ex)
             {
-                isPostingActivityError(true);
-                postActivity("Failed to compress: " + ex.Message, 0);
+
                 throw ex;
             }
+
+            //try
+            //{
+            //    FileInfo fi = new FileInfo(encFile);
+            //    using (FileStream inFile = fi.OpenRead())
+            //    {
+            //        if (fi.Extension != ".gz")
+            //        {
+            //            // Create the compressed file.
+            //            using (FileStream outFile = File.Create(fi.FullName + ".gz"))
+            //            {
+            //                using (GZipStream Compress = new GZipStream(outFile, CompressionMode.Compress))
+            //                {
+            //                    // Copy the source file into 
+            //                    // the compression stream.
+            //                    inFile.CopyTo(Compress);
+
+            //                    postActivity(String.Concat("Compressed ", fi.Name, " from ", fi.Length.ToString(), " to ", outFile.Length.ToString(), " bytes."), 0);
+            //                }
+            //            }
+            //        }
+            //        else
+            //        {
+            //            postActivity("Already compressed", 0);
+            //        }
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    isPostingActivityError(true);
+            //    postActivity("Failed to compress: " + ex.Message, 0);
+            //    throw ex;
+            //}
             
         }
 
