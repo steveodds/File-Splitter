@@ -30,7 +30,7 @@ namespace P2P_File_Sharing
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Store_File store_File = new Store_File();
-            +++++++++++store_File.ShowDialog();
+            store_File.ShowDialog();
         }
     }
 }
