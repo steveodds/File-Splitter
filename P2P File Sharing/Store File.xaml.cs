@@ -143,10 +143,11 @@ namespace P2P_File_Sharing
                     string fileName = fileInfo.FullName.Substring(0, pickedFile.Length - fileInfo.Name.Length);
                     zip.AddDirectory(fileName);
                     zip.Comment = "This zip was created at " + System.DateTime.Now.ToString("G");
-                    zip.MaxOutputSegmentSize = 100 * 1024; // 100k segments
-                    zip.Save("MyFiles.zip");
+                    zip.MaxOutputSegmentSize = 500 * 1024; // 100k segments
+                    zip.Save(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length),".zip"));
 
                     segmentsCreated = zip.NumberOfSegmentsForMostRecentSave;
+                    postActivity("File zipped, " + segmentsCreated + " files created. Waiting for distribution...", 0);
                 }
             }
             catch (Exception ex)
@@ -285,13 +286,14 @@ namespace P2P_File_Sharing
 
             if (encryptState)
             {
+                encryptState = false;
                 postActivity("Attempting to compress", 0);
                 fileZipper();
             }
             else
             {
                 isPostingActivityError(true);
-                postActivity("Process Failed", 0);
+                postActivity("Process Failed: Encryption", 0);
             }
             
         }

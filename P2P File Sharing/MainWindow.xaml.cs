@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.IO;
 
 namespace P2P_File_Sharing
 {
@@ -25,6 +26,10 @@ namespace P2P_File_Sharing
         {
             InitializeComponent();
             mainAppInstance = this;
+            if (!Directory.Exists(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage")))
+            {
+                Directory.CreateDirectory(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage"));
+            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
