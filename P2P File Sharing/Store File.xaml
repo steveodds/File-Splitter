@@ -50,7 +50,7 @@
 
         <Image x:Name="imgSaveFileType" HorizontalAlignment="Left" Height="337" Margin="10,10,0,0" VerticalAlignment="Top" Width="221"/>
         <TextBlock x:Name="tbPickedFile" HorizontalAlignment="Left" Height="21" Margin="10,352,0,0" TextWrapping="Wrap" Text="No file selected..." VerticalAlignment="Top" Width="221"/>
-        <Button x:Name="btnSaveFileSAVE" Content="SAVE" HorizontalAlignment="Left" Margin="10,0,0,10.4" Foreground="White" BorderBrush="#FF707070" Background="{x:Null}" FontSize="16" Style="{DynamicResource NoHoverinSaveFile}" Height="28" VerticalAlignment="Bottom" Width="221" Click="BtnSaveFileSAVE_Click"/>
+        <Button x:Name="btnSaveFileSAVE" Content="PICK A FILE" HorizontalAlignment="Left" Margin="10,0,0,10.4" Foreground="White" BorderBrush="#FF707070" Background="{x:Null}" FontSize="16" Style="{DynamicResource NoHoverinSaveFile}" Height="28" VerticalAlignment="Bottom" Width="221" Click="BtnSaveFileSAVE_Click"/>
 
     </Grid>
 </Window>

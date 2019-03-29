@@ -29,6 +29,11 @@ namespace P2P_File_Sharing
             if (!Directory.Exists(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage")))
             {
                 Directory.CreateDirectory(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage"));
+                tbAppActivity.Text = "Created required directory 'Peer_Storage' and other required directories in the Documents folder.";
+            }
+            else
+            {
+                tbAppActivity.Text = "Ready";
             }
         }
 
