@@ -35,7 +35,7 @@ namespace P2P_File_Sharing
 
         public bool filePicker()
         {
-            postActivity("Picking file...", 0);
+            postActivity("Picking file...", 1);
             bool success = false;
             System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog
             {
@@ -50,13 +50,11 @@ namespace P2P_File_Sharing
                 FileInfo fileInfo = new FileInfo(pickedFile);
                 success = true;
                 tbPickedFile.Text = fileInfo.Name + " is selected.";
-                isPostingActivityError(false);
-                postActivity("Successfully picked file", 0);
+                postActivity("Successfully picked file", 1);
             }
             else
             {
-                isPostingActivityError(true);
-                postActivity("Failed to pick file.", 0);
+                postActivity("Error: Failed to pick file.", 0);
                 success = false;
             }
 
@@ -84,7 +82,7 @@ namespace P2P_File_Sharing
             }
             catch (Exception ex)
             {
-                postActivity("Error: " + ex.Message, 0);
+                postActivity("Error: " + ex.Message, 0); //change to log file
                 throw ex;
             }
             
@@ -121,13 +119,12 @@ namespace P2P_File_Sharing
                         }
                     }
                 }
-                postActivity("Encrypted file.", 0);
+                postActivity("Encrypted file.", 1);
                 encryptState = true;
             }
             catch (Exception ex)
             {
-                isPostingActivityError(true);
-                postActivity("Failed. " + ex.Message, 0);
+                postActivity("Failed. " + ex.Message, 0);  //TODO Log file
             }
         }
 
@@ -147,7 +144,7 @@ namespace P2P_File_Sharing
                     zip.Save(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length),".zip"));
 
                     segmentsCreated = zip.NumberOfSegmentsForMostRecentSave;
-                    postActivity("File zipped, " + segmentsCreated + " files created. Waiting for distribution...", 0);
+                    postActivity("File zipped, " + segmentsCreated + " files created. Waiting for distribution...", 1);
                 }
             }
             catch (Exception ex)
@@ -155,40 +152,6 @@ namespace P2P_File_Sharing
 
                 throw ex;
             }
-
-            //try
-            //{
-            //    FileInfo fi = new FileInfo(encFile);
-            //    using (FileStream inFile = fi.OpenRead())
-            //    {
-            //        if (fi.Extension != ".gz")
-            //        {
-            //            // Create the compressed file.
-            //            using (FileStream outFile = File.Create(fi.FullName + ".gz"))
-            //            {
-            //                using (GZipStream Compress = new GZipStream(outFile, CompressionMode.Compress))
-            //                {
-            //                    // Copy the source file into 
-            //                    // the compression stream.
-            //                    inFile.CopyTo(Compress);
-
-            //                    postActivity(String.Concat("Compressed ", fi.Name, " from ", fi.Length.ToString(), " to ", outFile.Length.ToString(), " bytes."), 0);
-            //                }
-            //            }
-            //        }
-            //        else
-            //        {
-            //            postActivity("Already compressed", 0);
-            //        }
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    isPostingActivityError(true);
-            //    postActivity("Failed to compress: " + ex.Message, 0);
-            //    throw ex;
-            //}
-            
         }
 
         public int peerCheck()
@@ -237,19 +200,6 @@ namespace P2P_File_Sharing
 
         }
 
-        public static void isPostingActivityError(bool status)
-        {
-            if (status)
-            {
-                postActivity("", 0);
-                P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Foreground = new SolidColorBrush(Colors.Red);
-            }
-            else
-            {
-                P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Foreground = new SolidColorBrush(Color.FromRgb(179, 179, 179));
-            }
-        }
-
         public static void postActivity(string activityMessage, int postType)
         {
             if (postType == 1)
@@ -258,6 +208,8 @@ namespace P2P_File_Sharing
             }
             else
             {
+                P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Text = "";
+                P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Foreground = new SolidColorBrush(Colors.Red);
                 P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Text = activityMessage;
             }
             
@@ -265,7 +217,6 @@ namespace P2P_File_Sharing
 
         private void BtnSaveFileSAVE_Click(object sender, RoutedEventArgs e)
         {
-            isPostingActivityError(false);
             if (filePicker())
             {
                 if (fileHash())
@@ -279,20 +230,18 @@ namespace P2P_File_Sharing
                 }
                 else
                 {
-                    isPostingActivityError(true);
-                    postActivity("\nFailed to generate hash.", 1);
+                    postActivity("\nFailed to generate hash.", 0);
                 }
             }
 
             if (encryptState)
             {
                 encryptState = false;
-                postActivity("Attempting to compress", 0);
+                postActivity("Attempting to compress", 1);
                 fileZipper();
             }
             else
             {
-                isPostingActivityError(true);
                 postActivity("Process Failed: Encryption", 0);
             }
             
