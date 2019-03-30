@@ -141,7 +141,12 @@ namespace P2P_File_Sharing
                     zip.AddDirectory(fileName);
                     zip.Comment = "This zip was created at " + System.DateTime.Now.ToString("G");
                     zip.MaxOutputSegmentSize = 500 * 1024; // 100k segments
-                    zip.Save(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length),".zip"));
+                    if (!Directory.Exists(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length))))
+                    {
+                        Directory.CreateDirectory(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length)));
+
+                    }
+                    zip.Save(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length), "\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length),".zip"));
 
                     segmentsCreated = zip.NumberOfSegmentsForMostRecentSave;
                     postActivity("File zipped, " + segmentsCreated + " files created. Waiting for distribution...", 1);
@@ -206,11 +211,15 @@ namespace P2P_File_Sharing
             {
                 P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Text += activityMessage;
             }
-            else
+            else if (postType == 0)
             {
                 P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Text = "";
                 P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Foreground = new SolidColorBrush(Colors.Red);
                 P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Text = activityMessage;
+            }
+            else
+            {
+                P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Text = "Failed to get message...";
             }
             
         }

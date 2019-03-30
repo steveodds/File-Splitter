@@ -29,7 +29,13 @@ namespace P2P_File_Sharing
             if (!Directory.Exists(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage")))
             {
                 Directory.CreateDirectory(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage"));
-                tbAppActivity.Text = "Created required directory 'Peer_Storage' and other required directories in the Documents folder.";
+                if (!Directory.Exists(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp")) && !Directory.Exists(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ClusteredTemp")) && !Directory.Exists(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\Storage")))
+                {
+                    Directory.CreateDirectory(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp"));
+                    Directory.CreateDirectory(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ClusteredTemp"));
+                    Directory.CreateDirectory(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\Storage"));
+                    tbAppActivity.Text = "Created required directory 'Peer_Storage' and other required directories in the Documents folder.";
+                }
             }
             else
             {
@@ -39,8 +45,10 @@ namespace P2P_File_Sharing
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            tbAppActivity.Text = "";
             Store_File store_File = new Store_File();
             store_File.ShowDialog();
+            tbAppActivity.Text = "Ready.";
         }
     }
 }
