@@ -45,7 +45,6 @@ namespace P2P_File_Sharing
             };
             if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                tbClickHint.Text = "Working...";
                 pickedFile = openFileDialog.FileName;
                 FileInfo fileInfo = new FileInfo(pickedFile);
                 success = true;
@@ -135,18 +134,18 @@ namespace P2P_File_Sharing
                 int segmentsCreated;
                 using (ZipFile zip = new ZipFile())
                 {
-                    FileInfo fileInfo = new FileInfo(pickedFile);
+                    FileInfo zipFileInfo = new FileInfo(pickedFile);
                     //zip.AlternateEncoding = ;  // utf-8
-                    string fileName = fileInfo.FullName.Substring(0, pickedFile.Length - fileInfo.Name.Length);
-                    zip.AddDirectory(fileName);
+                    string fileName = String.Concat(zipFileInfo.FullName.Substring(0, pickedFile.Length - zipFileInfo.Extension.Length), ".enc");
+                    zip.AddFile(fileName);
                     zip.Comment = "This zip was created at " + System.DateTime.Now.ToString("G");
                     zip.MaxOutputSegmentSize = 500 * 1024; // 100k segments
-                    if (!Directory.Exists(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length))))
+                    if (!Directory.Exists(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", zipFileInfo.Name.Substring(0, zipFileInfo.Name.Length - zipFileInfo.Extension.Length))))
                     {
-                        Directory.CreateDirectory(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length)));
+                        Directory.CreateDirectory(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", zipFileInfo.Name.Substring(0, zipFileInfo.Name.Length - zipFileInfo.Extension.Length)));
 
                     }
-                    zip.Save(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length), "\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length),".zip"));
+                    zip.Save(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", zipFileInfo.Name.Substring(0, zipFileInfo.Name.Length - zipFileInfo.Extension.Length), "\\", zipFileInfo.Name.Substring(0, zipFileInfo.Name.Length - zipFileInfo.Extension.Length),".zip"));
 
                     segmentsCreated = zip.NumberOfSegmentsForMostRecentSave;
                     postActivity("File zipped, " + segmentsCreated + " files created. Waiting for distribution...", 1);
@@ -205,6 +204,12 @@ namespace P2P_File_Sharing
 
         }
 
+        public static void postActivity(string activityMessage)
+        {
+            P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Text = "";
+            P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Text = activityMessage;
+        }
+
         public static void postActivity(string activityMessage, int postType)
         {
             if (postType == 1)
@@ -226,6 +231,7 @@ namespace P2P_File_Sharing
 
         private void BtnSaveFileSAVE_Click(object sender, RoutedEventArgs e)
         {
+            tbClickHint.Text = "Working...";
             if (filePicker())
             {
                 if (fileHash())
