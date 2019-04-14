@@ -16,6 +16,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.IO.Compression;
 using Ionic.Zip;
+using System.Data.SQLite;
 
 namespace P2P_File_Sharing
 {
