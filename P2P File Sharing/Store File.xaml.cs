@@ -25,7 +25,7 @@ namespace P2P_File_Sharing
     /// </summary>
     public partial class Store_File : Window
     {
-        public string encFile, pickedFile, generatedHash, pickedFileExtension = null;
+        protected static string encFile, pickedFile, generatedHash, pickedFileExtension = null;
         public static bool encryptState = false;
         public Store_File()
         {
@@ -62,12 +62,11 @@ namespace P2P_File_Sharing
             return success;
         }
 
-        public bool fileHash()
+        private static bool fileHash()
         {
             bool success = false;
             try
             {
-                
                 postActivity("\nCalculating MD5 checksum...", 1);
                 using (var md5 = MD5.Create())
                 {
@@ -75,6 +74,7 @@ namespace P2P_File_Sharing
                     {
                         var hash = md5.ComputeHash(stream);
                         generatedHash = BitConverter.ToString(hash).Replace("-", "").ToLower();
+                        bool enterHash = insertToDB("firstHash", pickedFile, generatedHash);
                         postActivity("\tSuccessfully generated hash.", 1);
                         success = true;
                     }
@@ -88,6 +88,31 @@ namespace P2P_File_Sharing
             
 
             return success;
+        }
+
+        private static string fileHash(int enc)
+        {
+            string encHash = null;
+            try
+            {
+                postActivity("\nCalculating MD5 checksum...", 1);
+                using (var md5 = MD5.Create())
+                {
+                    using (var stream = File.OpenRead(pickedFile))
+                    {
+                        var hash = md5.ComputeHash(stream);
+                        encHash = BitConverter.ToString(hash).Replace("-", "").ToLower();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                postActivity("Error: " + ex.Message, 0); //change to log file
+                throw ex;
+            }
+
+
+            return encHash;
         }
 
         private static void fileEncryptor(string inputFile, string outputFile, string skey)
@@ -118,6 +143,12 @@ namespace P2P_File_Sharing
                             }
                         }
                     }
+                }
+                string encHash;
+                encHash = fileHash(0);
+                if (encHash != null)
+                {
+                    insertToDB("secondHash", inputFile, encHash);
                 }
                 postActivity("Encrypted file.", 1);
                 encryptState = true;
@@ -205,6 +236,33 @@ namespace P2P_File_Sharing
 
         }
 
+        private static bool insertToDB(string tablename, string param1, string param2)
+        {
+            bool insertResult = false;
+            SQLiteConnection insertCon = new SQLiteConnection("Data Source=ds.sqlite;Version=3;");
+            insertCon.Open();
+            SQLiteCommand sQLiteCommand = new SQLiteCommand(insertCon);
+            sQLiteCommand.CommandText = String.Format("insert into {0} values('{1}','{2}');", tablename, param1, param2);
+            if (sQLiteCommand.ExecuteNonQuery() != 0)
+            {
+                insertResult = true;
+            }
+            return insertResult;
+        }
+
+        private static bool insertToDB(string tablename, string param1, int param2)
+        {
+            bool insertResult = false;
+            SQLiteConnection insertCon = new SQLiteConnection("Data Source=ds.sqlite;Version=3;");
+            insertCon.Open();
+            SQLiteCommand sQLiteCommand = new SQLiteCommand(insertCon);
+            sQLiteCommand.CommandText = String.Format("insert into {0} values('{1}','{2}');", tablename, param1, param2);
+            if (sQLiteCommand.ExecuteNonQuery() != 0)
+            {
+                insertResult = true;
+            }
+            return insertResult;
+        }
         public static void postActivity(string activityMessage)
         {
             P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Text = "";
