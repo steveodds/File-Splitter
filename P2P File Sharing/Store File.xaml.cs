@@ -18,6 +18,7 @@ using System.IO.Compression;
 using Ionic.Zip;
 using System.Data.SQLite;
 
+
 namespace P2P_File_Sharing
 {
     /// <summary>
@@ -25,7 +26,7 @@ namespace P2P_File_Sharing
     /// </summary>
     public partial class Store_File : Window
     {
-        protected static string encFile, pickedFile, generatedHash, pickedFileExtension = null;
+        protected static string encFile, pickedFile, generatedHash, pickedFileExtension = null, thisDeviceID;
         public static bool encryptState = false;
         public Store_File()
         {
@@ -48,18 +49,47 @@ namespace P2P_File_Sharing
             {
                 pickedFile = openFileDialog.FileName;
                 FileInfo fileInfo = new FileInfo(pickedFile);
-                success = true;
-                tbPickedFile.Text = fileInfo.Name + " is selected.";
-                postActivity("Successfully picked file", 1);
+                if (existsInDB(fileInfo.FullName))
+                {
+                    MessageBox.Show("This file has been processed before. Please pick another file.", "FILE EXISTS ON NETWORK", MessageBoxButton.OK, MessageBoxImage.Error);
+                    postActivity("Error: Failed to pick file.", 0);
+                }
+                else
+                {
+                    success = true;
+                    tbPickedFile.Text = fileInfo.Name + " is selected.";
+                    postActivity("Successfully picked file", 1);
+                }
             }
             else
             {
                 postActivity("Error: Failed to pick file.", 0);
                 success = false;
             }
-
-
             return success;
+        }
+
+        private static bool existsInDB(string filename)
+        {
+            bool existsinDB = false;
+            long countNum = 0;
+            object count;
+            SQLiteConnection insertCon = new SQLiteConnection("Data Source=ds.sqlite;Version=3;");
+            insertCon.Open();
+            SQLiteCommand sQLiteCommand = new SQLiteCommand(insertCon);
+            sQLiteCommand.CommandText = String.Format("select count(*) from firstHash where filename = @param1;");
+            sQLiteCommand.Prepare();
+            sQLiteCommand.Parameters.AddWithValue("@param1", filename);
+            count = sQLiteCommand.ExecuteScalar();
+            countNum = (long)count;
+            if (countNum > 0)
+            {
+                existsinDB = true;
+            }
+
+            insertCon.Close();
+            insertCon.Dispose();
+            return existsinDB;
         }
 
         private static bool fileHash()
@@ -159,11 +189,11 @@ namespace P2P_File_Sharing
             }
         }
 
-        public void fileZipper()
+        private static int fileZipper()
         {
+            int? segmentsCreated = null;
             try
             {
-                int segmentsCreated;
                 using (ZipFile zip = new ZipFile())
                 {
                     FileInfo zipFileInfo = new FileInfo(pickedFile);
@@ -188,52 +218,92 @@ namespace P2P_File_Sharing
 
                 throw ex;
             }
+            return (int)segmentsCreated;
         }
 
-        public int peerCheck()
+        private static int fileClusterCalc(int segments, int peers)
         {
-            int numberOfPeers = 0;
+            int? clusterNum = null;
+            int rem = segments % peers;
 
-
-            return numberOfPeers;
+            if (rem > 0)
+            {
+                clusterNum = (segments / peers) + 1;
+            }
+            else
+            {
+                clusterNum = segments / peers;
+            }
+            return (int)clusterNum;
         }
 
-        public int ledgerVer()
+        private static void clusterChunk(int segments)
         {
-            int thisLedgerVer, currentLedgerVer, needsUpdate;
-            needsUpdate = 0;
-
-
-            return needsUpdate;
-        }
-
-        public int fileChunker()
-        {
-            int success = 0;
-
-
-            return success;
-        }
-
-        public int clusterChunk()
-        {
-            int success = 0;
-
-
-            return success;
-        }
-
-        public int clusterDistribute()
-        {
-            int success = 0;
-
-
-            return success;
+            int peers = 2, clusters = fileClusterCalc(segments, peers), numberOfFiles = 0, maxCluster = 0;
+            string fileAsFolder, startfolder, destinationFolder, hostDir;
+            FileInfo fileInfo = new FileInfo(pickedFile);
+            fileAsFolder = fileInfo.Name.Substring(0, fileInfo.Name.Length - System.IO.Path.GetExtension(pickedFile).Length);
+            startfolder = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length));
+            destinationFolder = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ClusteredTemp\\", fileAsFolder, "\\", String.Concat(fileAsFolder, "_Cluster"));
+            Directory.CreateDirectory(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ClusteredTemp\\", fileAsFolder));
+            hostDir = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ClusteredTemp\\", fileAsFolder);
+            for (int i = 0; i < peers; i++)
+            {
+                Directory.CreateDirectory(String.Concat(hostDir, "\\", String.Concat(fileAsFolder, "_Cluster", i + 1)));
+            }
+            numberOfFiles = Directory.GetFiles(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length))).Length;
+            string[] zippedFiles = new string[numberOfFiles];
+            Array.Copy(Directory.GetFiles(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length))), zippedFiles, numberOfFiles);
+            Random random = new Random();
+            maxCluster = peers;
+            while (maxCluster > 0)
+            {
+                string[] clusterExts = new string[clusters];
+                for (int i = 0; i < clusters; i++)
+                {
+                    bool fileExists = false;
+                    string currentFile;
+                    while (!fileExists)
+                    {
+                        if (Directory.EnumerateFileSystemEntries(startfolder).Any())
+                        {
+                            currentFile = zippedFiles[random.Next(numberOfFiles)];
+                            fileExists = File.Exists(currentFile);
+                            if (fileExists)
+                            {
+                                string ext = System.IO.Path.GetExtension(currentFile);
+                                File.Move(currentFile, String.Concat(destinationFolder, maxCluster, "\\", generatedHash, ext));
+                                clusterExts[i] = ext.Substring(1);
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                        
+                    }
+                      
+                }
+                string clusterHeader;
+                clusterHeader = String.Concat("peer1\n", string.Join("\n", clusterExts));
+                File.Create(String.Concat(destinationFolder, maxCluster, "\\_info")).Close();
+                File.WriteAllText(String.Concat(destinationFolder, maxCluster, "\\_info"), clusterHeader);
+                maxCluster--;
+            }
+            Directory.Delete(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length)));
         }
 
         public void cleanup()
         {
 
+        }
+
+        private static string checkDB(string tablename, string column, string param1)
+        {
+            string fetchedString = null;
+
+
+            return fetchedString;
         }
 
         private static bool insertToDB(string tablename, string param1, string param2)
@@ -242,7 +312,10 @@ namespace P2P_File_Sharing
             SQLiteConnection insertCon = new SQLiteConnection("Data Source=ds.sqlite;Version=3;");
             insertCon.Open();
             SQLiteCommand sQLiteCommand = new SQLiteCommand(insertCon);
-            sQLiteCommand.CommandText = String.Format("insert into {0} values('{1}','{2}');", tablename, param1, param2);
+            sQLiteCommand.CommandText = String.Format("insert into {0} values(@param1, @param2);", tablename);
+            sQLiteCommand.Prepare();
+            sQLiteCommand.Parameters.AddWithValue("@param1", param1);
+            sQLiteCommand.Parameters.AddWithValue("@param2", param2);
             if (sQLiteCommand.ExecuteNonQuery() != 0)
             {
                 insertResult = true;
@@ -299,7 +372,7 @@ namespace P2P_File_Sharing
                     FileInfo fileInfo = new FileInfo(pickedFile);
                     skey = generatedHash.Substring(0, 16);
                     pickedFileExtension = System.IO.Path.GetExtension(pickedFile);
-                    encFile = String.Concat(fileInfo.FullName.Substring(0, pickedFile.Length - 4), ".enc");
+                    encFile = String.Concat(fileInfo.FullName.Substring(0, pickedFile.Length - System.IO.Path.GetExtension(pickedFile).Length), ".enc");
                     fileEncryptor(pickedFile, encFile, skey);
                 }
                 else
@@ -312,7 +385,8 @@ namespace P2P_File_Sharing
             {
                 encryptState = false;
                 postActivity("Attempting to compress", 1);
-                fileZipper();
+                int segments = fileZipper();
+                clusterChunk(segments);
             }
             else
             {
