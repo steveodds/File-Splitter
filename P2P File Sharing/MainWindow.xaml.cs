@@ -14,6 +14,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
 using System.Data.SQLite;
+using System.Net.Sockets;
+using System.Collections;
+using System.Net;
+using System.Threading;
 
 namespace P2P_File_Sharing
 {
@@ -22,6 +26,7 @@ namespace P2P_File_Sharing
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static ArrayList nSockets;
         public static MainWindow mainAppInstance;
         public MainWindow()
         {
@@ -111,12 +116,88 @@ namespace P2P_File_Sharing
             creationCommands.ExecuteNonQuery();
         }
 
+        protected void sendFile(string filename, string receiverAddress)
+        {
+            Stream fileStream = File.OpenRead(filename);
+            // Alocate memory space for the file
+            byte[] fileBuffer = new byte[fileStream.Length];
+            fileStream.Read(fileBuffer, 0, (int)fileStream.Length);
+            // Open a TCP/IP Connection and send the data
+            TcpClient clientSocket = new TcpClient(receiverAddress, 8080);
+            NetworkStream networkStream = clientSocket.GetStream();
+            networkStream.Write(fileBuffer, 0, fileBuffer.GetLength(0));
+            networkStream.Close();
+        }
+
+        protected void conListener(string address)
+        {
+            IPHostEntry IPHost = Dns.GetHostEntry(Dns.GetHostName());
+            string ipAddress = IPHost.AddressList[0].ToString();
+            nSockets = new ArrayList();
+            Thread thdListener = new Thread(new ThreadStart(listenerThread));
+            thdListener.Start();
+        }
+
+        private void listenerThread()
+        {
+            string address;
+            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
+            {
+                socket.Connect("8.8.8.8", 65530);
+                IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
+                address = endPoint.Address.ToString();
+            }
+            IPAddress localAddr = IPAddress.Parse(address);
+            TcpListener tcpListener = new TcpListener(localAddr, 8080);
+            tcpListener.Start();
+            while (true)
+            {
+                Socket handlerSocket = tcpListener.AcceptSocket();
+                if (handlerSocket.Connected)
+                {
+                    //Control.CheckForIllegalCrossThreadCalls = false;
+                    lock (this)
+                    {
+                        nSockets.Add(handlerSocket);
+                    }
+                    ThreadStart thdstHandler = new
+                    ThreadStart(handlerThread);
+                    Thread thdHandler = new Thread(thdstHandler);
+                    thdHandler.Start();
+                }
+            }
+        }
+
+        public void handlerThread()
+        {
+            Socket handlerSocket = (Socket)nSockets[nSockets.Count - 1];
+            NetworkStream networkStream = new NetworkStream(handlerSocket);
+            int thisRead = 0;
+            int blockSize = 1024;
+            Byte[] dataByte = new Byte[blockSize];
+            lock (this)
+            {
+                // Only one process can access
+                // the same file at any given time
+                Stream fileStream = File.OpenWrite("c:\\my documents\\SubmittedFile.txt");
+                while (true)
+                {
+                    thisRead = networkStream.Read(dataByte, 0, blockSize);
+                    fileStream.Write(dataByte, 0, thisRead);
+                    if (thisRead == 0) break;
+                }
+                fileStream.Close();
+            }
+            handlerSocket = null;
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            int storeFileStatus;
             tbAppActivity.Text = "";
             Store_File store_File = new Store_File();
             store_File.ShowDialog();
-            tbAppActivity.Text = "Ready.";
+            tbAppActivity.Text = "Ready";
         }
     }
 }
