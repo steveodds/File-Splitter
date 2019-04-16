@@ -28,12 +28,16 @@ namespace P2P_File_Sharing
     {
         protected static string encFile, pickedFile, generatedHash, pickedFileExtension = null, thisDeviceID;
         public static bool encryptState = false;
+
         public Store_File()
         {
             InitializeComponent();
             this.Left = Application.Current.MainWindow.Left + Application.Current.MainWindow.ActualWidth;
-            this.Top = Application.Current.MainWindow.Top;            
+            this.Top = Application.Current.MainWindow.Top;
+            closeStateM = 1;
         }
+
+        public int closeStateM { get; set; }
 
         public bool filePicker()
         {
