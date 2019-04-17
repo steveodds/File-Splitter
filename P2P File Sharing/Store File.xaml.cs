@@ -26,7 +26,10 @@ namespace P2P_File_Sharing
     /// </summary>
     public partial class Store_File : Window
     {
-        protected static string encFile, pickedFile, generatedHash, pickedFileExtension = null, thisDeviceID;
+        private static string fClusteredTemp = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ClusteredTemp");
+        private static string fZippedTemp = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp");
+        private static string fPeer_Storage = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage");
+        private static string encFile, pickedFile, generatedHash, pickedFileExtension = null, thisDeviceID;
         public static bool encryptState = false;
 
         public Store_File()
@@ -206,12 +209,12 @@ namespace P2P_File_Sharing
                     zip.AddFile(fileName);
                     zip.Comment = "This zip was created at " + System.DateTime.Now.ToString("G");
                     zip.MaxOutputSegmentSize = 500 * 1024; // 100k segments
-                    if (!Directory.Exists(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", zipFileInfo.Name.Substring(0, zipFileInfo.Name.Length - zipFileInfo.Extension.Length))))
+                    if (!Directory.Exists(String.Concat(fZippedTemp, zipFileInfo.Name.Substring(0, zipFileInfo.Name.Length - zipFileInfo.Extension.Length))))
                     {
-                        Directory.CreateDirectory(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", zipFileInfo.Name.Substring(0, zipFileInfo.Name.Length - zipFileInfo.Extension.Length)));
+                        Directory.CreateDirectory(String.Concat(fZippedTemp, zipFileInfo.Name.Substring(0, zipFileInfo.Name.Length - zipFileInfo.Extension.Length)));
 
                     }
-                    zip.Save(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", zipFileInfo.Name.Substring(0, zipFileInfo.Name.Length - zipFileInfo.Extension.Length), "\\", zipFileInfo.Name.Substring(0, zipFileInfo.Name.Length - zipFileInfo.Extension.Length),".zip"));
+                    zip.Save(String.Concat(fZippedTemp, zipFileInfo.Name.Substring(0, zipFileInfo.Name.Length - zipFileInfo.Extension.Length), "\\", zipFileInfo.Name.Substring(0, zipFileInfo.Name.Length - zipFileInfo.Extension.Length),".zip"));
 
                     segmentsCreated = zip.NumberOfSegmentsForMostRecentSave;
                     postActivity("File zipped, " + segmentsCreated + " files created. Waiting for distribution...", 1);
@@ -247,17 +250,17 @@ namespace P2P_File_Sharing
             string fileAsFolder, startfolder, destinationFolder, hostDir;
             FileInfo fileInfo = new FileInfo(pickedFile);
             fileAsFolder = fileInfo.Name.Substring(0, fileInfo.Name.Length - System.IO.Path.GetExtension(pickedFile).Length);
-            startfolder = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length));
-            destinationFolder = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ClusteredTemp\\", fileAsFolder, "\\", String.Concat(fileAsFolder, "_Cluster"));
-            Directory.CreateDirectory(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ClusteredTemp\\", fileAsFolder));
-            hostDir = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ClusteredTemp\\", fileAsFolder);
+            startfolder = String.Concat(fZippedTemp, fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length));
+            destinationFolder = String.Concat(fClusteredTemp, fileAsFolder, "\\", String.Concat(fileAsFolder, "_Cluster"));
+            Directory.CreateDirectory(String.Concat(fClusteredTemp, fileAsFolder));
+            hostDir = String.Concat(fClusteredTemp, fileAsFolder);
             for (int i = 0; i < peers; i++)
             {
                 Directory.CreateDirectory(String.Concat(hostDir, "\\", String.Concat(fileAsFolder, "_Cluster", i + 1)));
             }
-            numberOfFiles = Directory.GetFiles(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length))).Length;
+            numberOfFiles = Directory.GetFiles(String.Concat(fZippedTemp, fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length))).Length;
             string[] zippedFiles = new string[numberOfFiles];
-            Array.Copy(Directory.GetFiles(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length))), zippedFiles, numberOfFiles);
+            Array.Copy(Directory.GetFiles(String.Concat(fZippedTemp, fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length))), zippedFiles, numberOfFiles);
             Random random = new Random();
             maxCluster = peers;
             while (maxCluster > 0)
@@ -294,7 +297,7 @@ namespace P2P_File_Sharing
                 File.WriteAllText(String.Concat(destinationFolder, maxCluster, "\\_info"), clusterHeader);
                 maxCluster--;
             }
-            Directory.Delete(String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length)));
+            Directory.Delete(String.Concat(fZippedTemp, fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length)));
         }
 
         public void cleanup()
@@ -376,7 +379,7 @@ namespace P2P_File_Sharing
                     FileInfo fileInfo = new FileInfo(pickedFile);
                     skey = generatedHash.Substring(0, 16);
                     pickedFileExtension = System.IO.Path.GetExtension(pickedFile);
-                    encFile = String.Concat(fileInfo.FullName.Substring(0, pickedFile.Length - System.IO.Path.GetExtension(pickedFile).Length), ".enc");
+                    encFile = String.Concat(fPeer_Storage, "\\", fileInfo.Name.Substring(0, pickedFile.Length - System.IO.Path.GetExtension(pickedFile).Length), ".enc");
                     fileEncryptor(pickedFile, encFile, skey);
                 }
                 else
