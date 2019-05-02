@@ -17,7 +17,9 @@ using System.Runtime.InteropServices;
 using System.IO.Compression;
 using Ionic.Zip;
 using System.Data.SQLite;
-
+using System.Net.Sockets;
+using System.Net;
+using System.Threading;
 
 namespace P2P_File_Sharing
 {
@@ -26,10 +28,11 @@ namespace P2P_File_Sharing
     /// </summary>
     public partial class Store_File : Window
     {
+        public int closeStateM { get; set; }
         private static string fClusteredTemp = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ClusteredTemp");
         private static string fZippedTemp = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp");
         private static string fPeer_Storage = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage");
-        private static string encFile, pickedFile, generatedHash, pickedFileExtension = null, thisDeviceID;
+        private static string encFile, pickedFile, generatedHash, pickedFileExtension = null;
         public static bool encryptState = false;
 
         public Store_File()
@@ -39,8 +42,6 @@ namespace P2P_File_Sharing
             this.Top = Application.Current.MainWindow.Top;
             closeStateM = 1;
         }
-
-        public int closeStateM { get; set; }
 
         public bool filePicker()
         {
@@ -205,7 +206,7 @@ namespace P2P_File_Sharing
                 {
                     FileInfo zipFileInfo = new FileInfo(pickedFile);
                     //zip.AlternateEncoding = ;  // utf-8
-                    string fileName = String.Concat(zipFileInfo.FullName.Substring(0, pickedFile.Length - zipFileInfo.Extension.Length), ".enc");
+                    string fileName = encFile;
                     zip.AddFile(fileName);
                     zip.Comment = "This zip was created at " + System.DateTime.Now.ToString("G");
                     zip.MaxOutputSegmentSize = 500 * 1024; // 100k segments
@@ -247,16 +248,20 @@ namespace P2P_File_Sharing
         private static void clusterChunk(int segments)
         {
             int peers = 2, clusters = fileClusterCalc(segments, peers), numberOfFiles = 0, maxCluster = 0;
-            string fileAsFolder, startfolder, destinationFolder, hostDir;
+            string fileAsFolder, startfolder, destinationFolder, hostDir, upDir;
+            string[] filedirectory = new string[peers];
             FileInfo fileInfo = new FileInfo(pickedFile);
             fileAsFolder = fileInfo.Name.Substring(0, fileInfo.Name.Length - System.IO.Path.GetExtension(pickedFile).Length);
             startfolder = String.Concat(fZippedTemp, fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length));
-            destinationFolder = String.Concat(fClusteredTemp, fileAsFolder, "\\", String.Concat(fileAsFolder, "_Cluster"));
-            Directory.CreateDirectory(String.Concat(fClusteredTemp, fileAsFolder));
-            hostDir = String.Concat(fClusteredTemp, fileAsFolder);
+            destinationFolder = String.Concat(fClusteredTemp, "\\", fileAsFolder, "\\", String.Concat(fileAsFolder, "_Cluster"));
+            upDir = String.Concat(fClusteredTemp, "\\", fileAsFolder, "\\");
+            Directory.CreateDirectory(String.Concat(fClusteredTemp, "\\", fileAsFolder));
+            hostDir = String.Concat(fClusteredTemp, "\\", fileAsFolder);
             for (int i = 0; i < peers; i++)
             {
-                Directory.CreateDirectory(String.Concat(hostDir, "\\", String.Concat(fileAsFolder, "_Cluster", i + 1)));
+                string dirtemp = String.Concat(hostDir, "\\", String.Concat(fileAsFolder, "_Cluster", i + 1));
+                Directory.CreateDirectory(dirtemp);
+                filedirectory[i] = dirtemp;
             }
             numberOfFiles = Directory.GetFiles(String.Concat(fZippedTemp, fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length))).Length;
             string[] zippedFiles = new string[numberOfFiles];
@@ -293,11 +298,76 @@ namespace P2P_File_Sharing
                 }
                 string clusterHeader;
                 clusterHeader = String.Concat("peer1\n", string.Join("\n", clusterExts));
-                File.Create(String.Concat(destinationFolder, maxCluster, "\\_info")).Close();
-                File.WriteAllText(String.Concat(destinationFolder, maxCluster, "\\_info"), clusterHeader);
+                int files_in_cluster = Directory.GetFiles(string.Concat(destinationFolder, maxCluster)).Length;
+                File.Create(String.Concat(upDir, "\\_info" + maxCluster)).Close();
+                //TextWriter textWriter = new StreamWriter(String.Concat(destinationFolder, maxCluster, "\\_info"), true);
+                //textWriter.WriteLine(numberOfFiles);
+                //textWriter.WriteLine(clusterHeader);
+                File.WriteAllText(String.Concat(destinationFolder, maxCluster, "\\_info"), files_in_cluster + "\n" + clusterHeader);
                 maxCluster--;
             }
             Directory.Delete(String.Concat(fZippedTemp, fileInfo.Name.Substring(0, fileInfo.Name.Length - fileInfo.Extension.Length)));
+            string[] peerIPs = new string[peers];
+            for (int i = 0; i < peers; i++)
+            {
+                peerIPs[i] = null;
+            }
+            sendFileSocket(filedirectory);
+        }
+
+        private static void sendFileSocket(string[] filedirectory)
+        {
+            try
+            {
+                string[] filestosend = new string[filedirectory.Length];
+                string outgoingdetails = string.Empty;
+                for (int i = 0; i < filedirectory.Length; i++)
+                {
+                    filestosend[i] = Directory.GetFiles(filedirectory[i]).Length.ToString();
+                    outgoingdetails = filestosend[i] + ",";
+                    string[] filelist = new string[int.Parse(filestosend[i])];
+                    Array.Copy(Directory.GetFiles(filedirectory[i]), filelist, int.Parse(filestosend[i]));
+                    outgoingdetails += filelist[0].Substring(0, filelist[0].Length - 4) + ",";
+                    for (int j = 0; j < filelist.Length; j++)
+                    {
+                        if (j != filelist.Length)
+                        {
+                            outgoingdetails += filelist[j].Substring(filelist[j].Length - 3) + "-";
+                        }
+                        else
+                        {
+                            outgoingdetails += filelist[j].Substring(filelist[j].Length - 3);
+                        }
+                    }
+                    Socket sck = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 1994);
+                    sck.Connect(endPoint);
+
+                    byte[] msgBuffer = Encoding.Default.GetBytes(outgoingdetails);
+                    sck.Send(msgBuffer, 0, msgBuffer.Length, SocketFlags.None);
+                    sck.Close();
+
+                    Thread.Sleep(2000);
+                    string serverAddr = "127.0.0.1";
+                    Socket filesck = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    IPEndPoint fileendPoint = new IPEndPoint(IPAddress.Parse(serverAddr), 1994);
+                    filesck.Connect(fileendPoint);
+                    for (int j = 0; j < filelist.Length; j++)
+                    {
+                        filesck.SendFile(filelist[i]);
+                    }
+                    filesck.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                MainWindow.mainAppInstance.tbServerActivity.Text = e.ToString();
+            }
+            
+            MainWindow.mainAppInstance.lblSavedFiles.Content = int.Parse(MainWindow.mainAppInstance.lblSavedFiles.Content.ToString()) + 1;
+            MainWindow.mainAppInstance.tbAppActivity.Text = "Files sent.";
+            Store_File store = new Store_File();
+            store.Close();
         }
 
         public void cleanup()
@@ -353,12 +423,10 @@ namespace P2P_File_Sharing
         {
             if (postType == 1)
             {
-                P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Text += activityMessage;
+                P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Text = activityMessage;
             }
             else if (postType == 0)
             {
-                P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Text = "";
-                P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Foreground = new SolidColorBrush(Colors.Red);
                 P2P_File_Sharing.MainWindow.mainAppInstance.tbAppActivity.Text = activityMessage;
             }
             else
@@ -379,7 +447,7 @@ namespace P2P_File_Sharing
                     FileInfo fileInfo = new FileInfo(pickedFile);
                     skey = generatedHash.Substring(0, 16);
                     pickedFileExtension = System.IO.Path.GetExtension(pickedFile);
-                    encFile = String.Concat(fPeer_Storage, "\\", fileInfo.Name.Substring(0, pickedFile.Length - System.IO.Path.GetExtension(pickedFile).Length), ".enc");
+                    encFile = String.Concat(fPeer_Storage, "\\", fileInfo.Name.Substring(0, fileInfo.Name.Length - System.IO.Path.GetExtension(fileInfo.Name).Length), ".enc");
                     fileEncryptor(pickedFile, encFile, skey);
                 }
                 else

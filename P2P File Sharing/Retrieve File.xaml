@@ -1,0 +1,14 @@
+﻿<Window x:Class="P2P_File_Sharing.Retrieve_File"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:P2P_File_Sharing"
+        mc:Ignorable="d"
+        Title="Retrieve_File" Height="463.6" Width="254.523" Background="#FF2B2B2B" Foreground="White">
+    <Grid>
+        <ListBox x:Name="lbStoredFiles" HorizontalAlignment="Left" Height="374" Margin="10,10,0,0" VerticalAlignment="Top" Width="227" Foreground="White" Background="{x:Null}"/>
+        <Button Content="RETRIEVE" HorizontalAlignment="Center" Height="28" Margin="0,396,0,0" VerticalAlignment="Top" Width="221" Foreground="White" Background="{x:Null}" FontSize="16" Click="Button_Click"/>
+
+    </Grid>
+</Window>
