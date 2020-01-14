@@ -108,6 +108,7 @@
     <Compile Include="Retrieve File.xaml.cs">
       <DependentUpon>Retrieve File.xaml</DependentUpon>
     </Compile>
+    <Compile Include="StartupFunctions.cs" />
     <Compile Include="Store File.xaml.cs">
       <DependentUpon>Store File.xaml</DependentUpon>
     </Compile>
