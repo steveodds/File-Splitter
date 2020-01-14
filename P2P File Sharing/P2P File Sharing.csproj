@@ -105,10 +105,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MessageType.cs" />
     <Compile Include="Retrieve File.xaml.cs">
       <DependentUpon>Retrieve File.xaml</DependentUpon>
     </Compile>
     <Compile Include="StartupFunctions.cs" />
+    <Compile Include="StatusMessage.cs" />
     <Compile Include="Store File.xaml.cs">
       <DependentUpon>Store File.xaml</DependentUpon>
     </Compile>

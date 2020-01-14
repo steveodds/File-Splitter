@@ -135,10 +135,7 @@ namespace P2P_File_Sharing
         //    }
         //}
 
-        private void setActivityText(string message)
-        {
-            tbAppActivity.Text = message;
-        }
+        
 
         private void BtnRetrieveFile_Click(object sender, RoutedEventArgs e)
         {
@@ -174,11 +171,11 @@ namespace P2P_File_Sharing
             storeFileWindowStatus = store_File.closeStateM;
             if (storeFileWindowStatus == 1)
             {
-                setActivityText("Ready");
+                StatusMessage.PostToActivityBox("Ready", MessageType.NONE);
             }
             else
             {
-                setActivityText("Process 'Save File' cancelled.");
+                StatusMessage.PostToActivityBox("Process 'Save File' cancelled.", MessageType.WARNING);
             }
         }
     }
