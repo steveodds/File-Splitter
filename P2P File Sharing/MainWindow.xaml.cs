@@ -25,8 +25,6 @@ namespace P2P_File_Sharing
     /// </summary>
     public partial class MainWindow : Window
     {
-        Dispatcher serverdispatcher, directorydispatcher;
-        bool file = false;
         public static MainWindow mainAppInstance;
         public string clientfileinfo = null;
         public MainWindow()
@@ -46,14 +44,6 @@ namespace P2P_File_Sharing
             //AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
         }
 
-        public void OnProcessExit(object sender, EventArgs e)
-        {
-            serverdispatcher.BeginInvokeShutdown(DispatcherPriority.Background);
-            directorydispatcher.BeginInvokeShutdown(DispatcherPriority.Background);
-            Application.Current.Shutdown();
-        }
-
-        
 
         //private void serverListenerThread()
         //{
@@ -149,7 +139,7 @@ namespace P2P_File_Sharing
             MessageBoxResult messageBoxResult = MessageBox.Show("Are you sure you want to retrieve all files?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Information);
             if (messageBoxResult == MessageBoxResult.Yes)
             {
-
+                //TODO Retrieve all split files
             }
         }
 
@@ -158,25 +148,14 @@ namespace P2P_File_Sharing
             MessageBoxResult messageBoxResult = MessageBox.Show("Are you sure you want to leave the network?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Information);
             if (messageBoxResult == MessageBoxResult.Yes)
             {
-
+                //TODO Remove references to this feature
             }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            int storeFileWindowStatus;
-            tbAppActivity.Text = "";
             Store_File store_File = new Store_File();
             store_File.ShowDialog();
-            storeFileWindowStatus = store_File.closeStateM;
-            if (storeFileWindowStatus == 1)
-            {
-                StatusMessage.PostToActivityBox("Ready", MessageType.NONE);
-            }
-            else
-            {
-                StatusMessage.PostToActivityBox("Process 'Save File' cancelled.", MessageType.WARNING);
-            }
         }
     }
 }
