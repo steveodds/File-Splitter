@@ -1,8 +1,11 @@
-﻿namespace P2P_File_Sharing
+﻿using System.Linq;
+using System.Windows;
+
+namespace P2P_File_Sharing
 {
     public class StatusMessage
     {
-        private static readonly MainWindow _mainWindow = new MainWindow();
+        private static readonly MainWindow _mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
         public static void PostToActivityBox(string message, MessageType messageType)
         {
             switch (messageType)

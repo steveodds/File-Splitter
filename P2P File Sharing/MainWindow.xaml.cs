@@ -17,6 +17,7 @@ using System.Collections;
 using System.Net;
 using System.Threading;
 using System.Windows.Threading;
+using static P2P_File_Sharing.StatusMessage;
 
 namespace P2P_File_Sharing
 {
@@ -155,7 +156,10 @@ namespace P2P_File_Sharing
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Store_File store_File = new Store_File();
+            PostToActivityBox("Pick a file for storage...", MessageType.NONE);
             store_File.ShowDialog();
+
+            PostToActivityBox("Ready.", MessageType.NONE);
         }
     }
 }
