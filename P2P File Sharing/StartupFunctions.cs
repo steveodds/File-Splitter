@@ -39,11 +39,9 @@ namespace P2P_File_Sharing
                     Directory.CreateDirectory(_storageFolder);
                     Directory.CreateDirectory(_encrypted);
                     Directory.CreateDirectory(_compressed);
-                    //TODO: Update status message to reflect these changes.
                     PostToActivityBox("Created storage folders.", MessageType.INFORMATION);
                 }
 
-                //TODO Send "Ready" message to status message.
                 if (!Directory.Exists(_encrypted))
                 {
                     Directory.CreateDirectory(_encrypted);

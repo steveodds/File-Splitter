@@ -33,7 +33,7 @@ namespace P2P_File_Sharing
             InitializeComponent();
             mainAppInstance = this;
             StartupFunctions.DirectoryCheck();
-            StartupFunctions.DBCheck();
+            StartupFunctions.DBCreate();
 
             //The below is server code that is no longer in use:
             //Dispatcher.BeginInvoke(new Action(() => new Thread(delegate () 
