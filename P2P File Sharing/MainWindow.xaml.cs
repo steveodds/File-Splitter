@@ -34,99 +34,8 @@ namespace P2P_File_Sharing
             mainAppInstance = this;
             StartupFunctions.DirectoryCheck();
             StartupFunctions.DBCreate();
-
-            //The below is server code that is no longer in use:
-            //Dispatcher.BeginInvoke(new Action(() => new Thread(delegate () 
-            //{
-            //    serverListenerThread();
-            //}).Start()), DispatcherPriority.ContextIdle, null);
-
-
-            //AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
         }
 
-
-        //private void serverListenerThread()
-        //{
-        //    serverdispatcher = Dispatcher.CurrentDispatcher;
-        //    try
-        //    {
-        //        Socket sck = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        //        sck.Bind(new IPEndPoint(IPAddress.Any, 1994));
-        //        tbServerActivity.Text = "Listening...";
-        //        sck.Listen(0);
-        //        Socket acc = sck.Accept();
-        //        tbServerActivity.Text = "Client connected.";
-
-        //        string destination = storageF;
-        //        string[] incomingDetails = new string[4];
-
-        //        while (!file)
-        //        {
-        //            byte[] msgbuffer = new byte[255];
-
-        //            int rec = acc.Receive(msgbuffer, 0, msgbuffer.Length, SocketFlags.None);
-        //            Array.Resize(ref msgbuffer, rec);
-        //            clientfileinfo = Encoding.Default.GetString(msgbuffer);
-        //            if (!clientfileinfo.Equals(null))
-        //            {
-        //                file = true;
-        //            }
-        //        }
-        //        tbServerActivity.Text = "Received file details";
-        //        sck.Close();
-        //        acc.Close();
-
-        //        incomingDetails = clientfileinfo.Split(',');
-        //        destination += "\\" + incomingDetails[1];
-        //        Directory.CreateDirectory(destination);
-        //        int numberOfFiles = int.Parse(incomingDetails[0]);
-        //        string[] fileExts = new string[numberOfFiles];
-        //        fileExts = incomingDetails[2].Split('-');
-
-        //        Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        //        socket.Bind(new IPEndPoint(IPAddress.Any, 1994));
-        //        tbServerActivity.Text = "Waiting for files...";
-        //        socket.Listen(0);
-        //        Socket filesock = socket.Accept();
-        //        tbServerActivity.Text = "Receiving files...";
-        //        if (numberOfFiles > 0)
-        //        {
-        //            for (int i = 0; i < numberOfFiles; i++)
-        //            {
-        //                using (Stream strm = new FileStream(destination + "." + fileExts[i], FileMode.CreateNew))
-        //                {
-        //                    const int arSize = 100;
-        //                    byte[] buffer = new byte[arSize];
-        //                    SocketError errorCode;
-        //                    int readBytes = -1;
-
-        //                    int blockCtr = 0;
-        //                    int totalReadBytes = 0;
-        //                    while (readBytes != 0)
-        //                    {
-        //                        readBytes = filesock.Receive(buffer, 0, arSize, SocketFlags.None, out errorCode);
-        //                        blockCtr++;
-        //                        totalReadBytes += readBytes;
-        //                        strm.Write(buffer, 0, readBytes);
-        //                    }
-        //                    strm.Close();
-        //                }
-        //            }
-        //            tbServerActivity.Text = "Done.";
-        //            socket.Close();
-        //            filesock.Close();
-        //        }
-        //        destination = storageF;
-        //        serverListenerThread();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        //tbServerActivity.Text = e.ToString();
-        //    }
-        //}
-
-        
 
         private void BtnRetrieveFile_Click(object sender, RoutedEventArgs e)
         {
@@ -140,7 +49,7 @@ namespace P2P_File_Sharing
             MessageBoxResult messageBoxResult = MessageBox.Show("Are you sure you want to retrieve all files?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Information);
             if (messageBoxResult == MessageBoxResult.Yes)
             {
-                //TODO Retrieve all split files
+                //TODO Retrieve all stored files
             }
         }
 
