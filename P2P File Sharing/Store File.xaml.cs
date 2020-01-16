@@ -49,4 +49,37 @@ namespace P2P_File_Sharing
 
         }
     }
+
+    public class StoreFile
+    {
+        private string _fileName;
+        private string _customLocation;
+
+        public StoreFile(string fileName)
+        {
+            _fileName = fileName;
+        }
+
+        public StoreFile(string fileName, string customLocation)
+        {
+            _fileName = fileName;
+            _customLocation = customLocation;
+        }
+
+
+        public static bool IsStored(string filename)
+        {
+            //TODO Call method in DB controller class to check if file exists
+            return false;
+        }
+
+        private bool Store()
+        {
+            if (IsStored(_fileName))
+                return false;
+
+            //TODO Call method in DBController to store file in DB
+            return false;
+        }
+    }
 }
