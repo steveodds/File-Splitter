@@ -33,7 +33,6 @@ namespace P2P_File_Sharing
             InitializeComponent();
             mainAppInstance = this;
             StartupFunctions.DirectoryCheck();
-            StartupFunctions.DBCreate();
         }
 
 

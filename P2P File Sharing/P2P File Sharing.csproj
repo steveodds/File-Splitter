@@ -106,6 +106,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DBController.cs" />
+    <Compile Include="EFile.cs" />
+    <Compile Include="FileDBActions.cs" />
     <Compile Include="MessageType.cs" />
     <Compile Include="Retrieve File.xaml.cs">
       <DependentUpon>Retrieve File.xaml</DependentUpon>
@@ -115,6 +117,7 @@
     <Compile Include="Store File.xaml.cs">
       <DependentUpon>Store File.xaml</DependentUpon>
     </Compile>
+    <Compile Include="StoreFile.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

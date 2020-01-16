@@ -7,12 +7,12 @@ namespace P2P_File_Sharing
 {
     public class DBController
     {
-        private readonly SQLiteConnection _dbCon;
+        protected static readonly SQLiteConnection _dbCon = new SQLiteConnection("Data Source=ds.sqlite;Version=3;");
         private static readonly string _dbFile = $@"{Directory.GetCurrentDirectory()}\ds.sqlite";
+
         public DBController()
         {
             CreateDB();
-            _dbCon = new SQLiteConnection("Data Source=ds.sqlite;Version=3;");
         }
 
         public static bool Exists() => File.Exists(_dbFile);
@@ -44,6 +44,7 @@ namespace P2P_File_Sharing
                 creationCommands.CommandText += createEncryptedFileTable;
 
                 creationCommands.ExecuteNonQuery();
+                dsCon.Close();
             }
         }
 
@@ -63,7 +64,7 @@ namespace P2P_File_Sharing
                 tempcheck = sQLiteCommand.ExecuteScalar();
                 tablecheck[1] += (long)tempcheck;
             }
-
+            dsConTableCheck.Close();
             if (tablecheck.Sum() != 2)
                 return false;
 
@@ -93,6 +94,7 @@ namespace P2P_File_Sharing
                     _dbCon.Close();
                     throw new ArgumentException("The table does not exist");
             }
+            _dbCon.Close();
         }
 
         public void ReadFromDB(string tablename, string column, string value)
