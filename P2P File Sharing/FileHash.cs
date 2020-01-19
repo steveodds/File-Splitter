@@ -1,9 +1,12 @@
-﻿namespace P2P_File_Sharing
+﻿using System;
+using System.IO;
+using System.Security.Cryptography;
+
+namespace P2P_File_Sharing
 {
     public class FileHash
     {
         private string _fileName;
-        private string _hash;
         private string _formattedHash;
         public FileHash(string fileName)
         {
@@ -12,17 +15,16 @@
 
         public string GenerateFileHash()
         {
-            //TODO Generate hash of file
+            if (_fileName == null)
+                throw new ArgumentNullException("The file name cannot be null");
 
-            return _hash;
-        }
-
-        public string FormatFileHash()
-        {
-            if (string.IsNullOrEmpty(_hash))
-                GenerateFileHash();
-
-            //TODO Format hash string
+            using (var md5 = MD5.Create())
+            {
+                using (var stream = File.OpenRead(_fileName))
+                {
+                    _formattedHash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
+                }
+            }
             return _formattedHash;
         }
     }
