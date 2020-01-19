@@ -71,7 +71,7 @@ namespace P2P_File_Sharing
             return true;
         }
 
-        public void WriteToDB(string tableName, string[] values)
+        public static void WriteToDB(string tableName, EFile fileDetails)
         {
             _dbCon.Open();
             switch (tableName.ToLowerInvariant())

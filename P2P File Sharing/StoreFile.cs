@@ -8,13 +8,14 @@
         public StoreFile(EFile file)
         {
             _file = file;
+            Store();
         }
 
         private void Store()
         {
             if (!_file.IsStored)
             {
-                //TODO Call method in DBController to store file in DB
+                DBController.WriteToDB("storedfiles", _file);
             }
         }
     }

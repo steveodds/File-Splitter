@@ -28,9 +28,8 @@ namespace P2P_File_Sharing
 
         private string GenerateHash(string fileName)
         {
-            var hash = "";
-
-
+            var getHash = new FileHash(fileName);
+            var hash = getHash.GenerateFileHash();
             return hash;
         }
 
