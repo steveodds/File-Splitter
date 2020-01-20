@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
+using System.IO;
 using System.Windows;
 
 namespace P2P_File_Sharing
@@ -8,10 +10,6 @@ namespace P2P_File_Sharing
     /// </summary>
     public partial class Store_File : Window
     {
-        private readonly string fClusteredTemp = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ClusteredTemp");
-        private readonly string fZippedTemp = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage\\ZippedTemp");
-        private readonly string fPeer_Storage = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "\\Peer_Storage");
-
         public Store_File()
         {
             InitializeComponent();
@@ -21,12 +19,34 @@ namespace P2P_File_Sharing
 
         private void BtnSaveFileSAVE_Click(object sender, RoutedEventArgs e)
         {
-
+            //TODO Complete the program flow
+            var filename = PickFile();
+            var fileDetails = new FileInfo(filename);
+            var fileObject = new EFile(fileDetails);
+            var encryptFile = new FileEncryptor(fileObject);
+            try
+            {
+                if (!encryptFile.IsAlreadyEncrypted())
+                {
+                    encryptFile.FileEncrypt();
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage.PostToActivityBox("Attempting Encryption: " + ex.ToString(), MessageType.ERROR);
+            }
         }
 
-        private void TestMethod()
+        private string PickFile()
         {
+            OpenFileDialog openFileDialog = new OpenFileDialog()
+            {
+                Multiselect = false,
+                Title = "Pick the file you want to store..."
+            };
 
+
+            return openFileDialog.FileName;
         }
     }
 }
