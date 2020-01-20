@@ -23,6 +23,7 @@ namespace P2P_File_Sharing
             var filename = PickFile();
             var fileDetails = new FileInfo(filename);
             var fileObject = new EFile(fileDetails);
+            DBController.WriteToDB("files", fileObject);
             var encryptFile = new FileEncryptor(fileObject);
             try
             {

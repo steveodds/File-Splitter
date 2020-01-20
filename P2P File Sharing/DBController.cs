@@ -73,29 +73,34 @@ namespace P2P_File_Sharing
 
         public static void WriteToDB(string tableName, EFile fileDetails)
         {
-            _dbCon.Open();
+            SQLiteConnection dbConIN = new SQLiteConnection("Data Source=ds.sqlite;Version=3;");
+            dbConIN.Open();
             switch (tableName.ToLowerInvariant())
             {
                 case "files":
-                    using (SQLiteCommand sQLiteCommand = new SQLiteCommand(_dbCon))
+                    using (SQLiteCommand sQLiteCommand = new SQLiteCommand(dbConIN))
                     {
                         //TODO Add insertion commands
+                        sQLiteCommand.CommandText = $"INSERT INTO files VALUES ('{fileDetails.FileHash}', '{fileDetails.FileName}', false)";
+                        sQLiteCommand.ExecuteNonQuery();
                     }
                     break;
 
                 case "storedfiles":
-                    using (SQLiteCommand sQLiteCommand = new SQLiteCommand(_dbCon))
+                    using (SQLiteCommand sQLiteCommand = new SQLiteCommand(dbConIN))
                     {
                         //TODO Add insertion commands
                     }
                     break;
 
                 default:
-                    _dbCon.Close();
+                    dbConIN.Close();
                     throw new ArgumentException("The table does not exist");
             }
-            _dbCon.Close();
+            dbConIN.Close();
         }
+
+
 
         public void ReadFromDB(string tablename, string column, string value)
         {
