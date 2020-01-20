@@ -46,6 +46,8 @@ namespace P2P_File_Sharing
 
         public void FileEncrypt()
         {
+            if (IsAlreadyEncrypted())
+                throw new Exception("The file is already encrypted.");
             var salt = GenerateRandomSalt();
             FileStream fsCrypt = new FileStream(_fileName + ".aes", FileMode.Create);
 
@@ -95,6 +97,10 @@ namespace P2P_File_Sharing
 
         public void FileDecrypt()
         {
+            if (IsAlreadyDecrypted())
+                throw new Exception("File wasn't encrypted.");
+
+
             byte[] passwordBytes = System.Text.Encoding.UTF8.GetBytes(_password);
             byte[] salt = new byte[32];
 
