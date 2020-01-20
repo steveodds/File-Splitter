@@ -19,7 +19,7 @@ namespace P2P_File_Sharing
         public FileEncryptor(EFile fileData)
         {
             //TODO use internal methods to check if file is encrypted or not
-            _fileName = fileData.FileName;
+            _fileName = fileData.FileLocation;
             _password = fileData.FileHash;
             if (fileData.IsStored)
             {
@@ -82,6 +82,7 @@ namespace P2P_File_Sharing
                 }
 
                 fsIn.Close();
+                StatusMessage.PostToActivityBox("File encrypted.", MessageType.INFORMATION);
             }
             catch (Exception ex)
             {

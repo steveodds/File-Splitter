@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+
 namespace P2P_File_Sharing
 {
     public class FileDBActions : DBController
@@ -14,9 +16,9 @@ namespace P2P_File_Sharing
         {
             if (!IsFileInDB(file))
                 throw new ArgumentException("The file does not exist in the database.");
-            var fileDetails = new EFile();
+            var temp = new FileInfo("nodata.txt");
             //TODO Check file date in db
-            return fileDetails;
+            return new EFile(temp);
         }
     }
 }

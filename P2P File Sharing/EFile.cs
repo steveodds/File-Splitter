@@ -19,7 +19,7 @@ namespace P2P_File_Sharing
             FileName = fileInfo.Name;
             FileLocation = fileInfo.FullName;
             IsStored = IsFileInDB(FileName);
-            FileHash = GenerateHash(FileName);
+            FileHash = GenerateHash(FileLocation);
         }
 
         private string GenerateHash(string fileName)

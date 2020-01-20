@@ -44,7 +44,7 @@ namespace P2P_File_Sharing
                 Multiselect = false,
                 Title = "Pick the file you want to store..."
             };
-
+            openFileDialog.ShowDialog();
 
             return openFileDialog.FileName;
         }

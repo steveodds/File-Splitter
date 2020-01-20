@@ -31,8 +31,8 @@
         <Label Content="Stored Files:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="364,34,0,0" Foreground="White"/>
         <Ellipse HorizontalAlignment="Left" Height="136" Stroke="#FF00C309" VerticalAlignment="Top" Width="136" Margin="364,65,0,0"/>
         <Label x:Name="lblDevicesWFragments" Content="0" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="84" Margin="397,91,0,0" VerticalAlignment="Top" Width="71" FontSize="48" FontWeight="Bold" Foreground="#FF00C309"/>
-        <Label Content="Activity:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="364,339,0,0" Foreground="White"/>
-        <TextBlock x:Name="tbAppActivity" HorizontalAlignment="Left" Height="32" Margin="364,367,0,0" TextWrapping="Wrap" Text="No activity..." VerticalAlignment="Top" Width="433" Foreground="#FFB3B3B3" x:FieldModifier="public"/>
+        <Label Content="Activity:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="364,262,0,0" Foreground="White"/>
+        <TextBlock x:Name="tbAppActivity" HorizontalAlignment="Left" Height="106.04" Margin="364,292.96,0,0" TextWrapping="Wrap" Text="No activity..." VerticalAlignment="Top" Width="433" Foreground="#FFB3B3B3" x:FieldModifier="public"/>
         <Label Content="Recent Files:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="556,34,0,0" Foreground="White" Width="78.71"/>
         <TextBlock x:Name="tbFileList" HorizontalAlignment="Left" Height="135" Margin="556,66,0,0" TextWrapping="Wrap" Text="No activity..." VerticalAlignment="Top" Width="241" Foreground="#FFB3B3B3" x:FieldModifier="public" d:LayoutOverrides="VerticalAlignment" Padding="5,2,0,0"/>
     </Grid>
