@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System;
 using System.IO;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace P2P_File_Sharing
 {
@@ -83,6 +84,7 @@ namespace P2P_File_Sharing
 
                 fsIn.Close();
                 StatusMessage.PostToActivityBox("File encrypted.", MessageType.INFORMATION);
+                //TODO File.Delete(_fileName);
             }
             catch (Exception ex)
             {
@@ -131,6 +133,8 @@ namespace P2P_File_Sharing
                     Application.DoEvents();
                     fsOut.Write(buffer, 0, read);
                 }
+                StatusMessage.PostToActivityBox("File decrypted", MessageType.INFORMATION);
+                Process.Start(_fileName);
             }
             catch (CryptographicException ex_CryptographicException)
             {

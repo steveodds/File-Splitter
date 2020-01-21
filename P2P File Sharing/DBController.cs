@@ -102,9 +102,18 @@ namespace P2P_File_Sharing
 
 
 
-        public void ReadFromDB(string tablename, string column, string value)
+        public static void ReadFromDB(string tablename, string column, string value)
         {
             //TODO Add code that reads from DB
+        }
+
+        public static EFile ReadFileDetails(string file)
+        {
+            //TODO Read file details and add them to the proper EFile parameters.
+            
+
+
+            return new EFile();
         }
     }
 }

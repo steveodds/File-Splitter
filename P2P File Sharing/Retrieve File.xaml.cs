@@ -31,7 +31,20 @@ namespace P2P_File_Sharing
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-
+            //TODO Refactor
+            var filename = lbStoredFiles.SelectedItem.ToString();
+            if (filename != null)
+            {
+                var fileDetails = DBController.ReadFileDetails(filename);
+                var decryptFile = new FileEncryptor(fileDetails);
+                if (decryptFile.IsAlreadyDecrypted())
+                {
+                    StatusMessage.PostToActivityBox("Cannot decrypt file: The file was already decrypted", MessageType.ERROR);
+                    throw new Exception("File is already decrypted");
+                }
+                decryptFile.FileDecrypt();
+                //TODO Make sure DB is updated
+            }
         }
     }
 }

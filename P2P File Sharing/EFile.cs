@@ -14,6 +14,10 @@ namespace P2P_File_Sharing
         public string FileHash { get; set; }
         public bool IsStored { get; set; }
 
+        public EFile()
+        {
+
+        }
         public EFile(FileInfo fileInfo)
         {
             FileName = fileInfo.Name;
