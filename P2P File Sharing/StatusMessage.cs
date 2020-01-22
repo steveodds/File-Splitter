@@ -29,7 +29,7 @@ namespace P2P_File_Sharing
             }
         }
 
-        public static void Log(string message)
+        public void Log(string message)
         {
             if (!File.Exists("errors.log"))
                 File.Create("errors.log");

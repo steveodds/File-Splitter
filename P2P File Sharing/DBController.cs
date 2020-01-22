@@ -45,6 +45,7 @@ namespace P2P_File_Sharing
             }
         }
 
+        
         private static bool HasTables()
         {
             object tempcheck;
@@ -102,7 +103,6 @@ namespace P2P_File_Sharing
             {
                 using (SQLiteCommand sQLiteCommand = new SQLiteCommand(_dbCon))
                 {
-                    //TODO Add insertion commands
                     sQLiteCommand.CommandText =
                         $@"
                         INSERT INTO {table} 
@@ -117,7 +117,8 @@ namespace P2P_File_Sharing
             catch (Exception ex)
             {
                 StatusMessage.PostToActivityBox($"Writing to {table} table: " + ex, MessageType.ERROR);
-                StatusMessage.Log($"DBController.WriteToTables with {table} as the table and {parameters.Length} parameters. Exception: \n" + ex);
+                StatusMessage logger = new StatusMessage();
+                logger.Log($"DBController.WriteToTables with {table} as the table and {parameters.Length} parameters. Exception: \n" + ex);
             }
             finally
             {
@@ -157,7 +158,8 @@ namespace P2P_File_Sharing
             catch (Exception ex)
             {
                 StatusMessage.PostToActivityBox("File deails in DB: " + ex, MessageType.ERROR);
-                StatusMessage.Log($"DBController.ReadFromDB with {tablename} as the table and {column} as the column. Exception: \n" + ex);
+                StatusMessage logger = new StatusMessage();
+                logger.Log($"DBController.ReadFromDB with {tablename} as the table and {column} as the column. Exception: \n" + ex);
             }
             finally
             {
@@ -167,9 +169,22 @@ namespace P2P_File_Sharing
             return detailsFromDB;
         }
 
-        public static EFile ReadFileDetails(string file)
+        public static EFile ReadFileDetails(string filename)
         {
-            //TODO Read file details and add them to the proper EFile parameters.
+            var filehash = new FileHash(filename);
+            var normalFile = ReadFromDB("files", "filehash", filehash.GenerateFileHash());
+            var filedetails = new EFile()
+            {
+                FileHash = normalFile[1],
+                FileName = normalFile[2],
+                IsStored = Convert.ToBoolean(normalFile[3])
+            };
+
+            return filedetails;
+        }
+
+        public static EFile ReadEncryptedFileDetails(string file)
+        {
             var filehash = new FileHash(file);
             var hash = filehash.GenerateFileHash();
             var encryptedFile = ReadFromDB("storedfiles", "filehash", hash);
@@ -179,16 +194,12 @@ namespace P2P_File_Sharing
                 EncryptedHash = encryptedFile[2],
                 StoredDateTime = DateTime.Parse(encryptedFile[3])
             };
-            var standardFile = ReadFromDB("files", "filehash", hash);
-            fileDetails.FileName = standardFile[2];
-            fileDetails.IsStored = Convert.ToBoolean(standardFile[3]);
 
             return fileDetails;
         }
 
         public static bool IsFileInDB(string filename)
         {
-            //TODO Check if filename is in DB
             var filesHash = new FileHash(filename);
             var temp = ReadFromDB("storedfiles", "filehash", filesHash.GenerateFileHash());
             return !string.IsNullOrEmpty(temp[1]);

@@ -15,7 +15,7 @@ namespace P2P_File_Sharing
         private readonly string _encryptedFilename;
         private string encryptedHash;
 
-        public string EncryptedHash { get => encryptedHash; private set => encryptedHash = _encryptedHash; }
+        public string EncryptedHash { get => encryptedHash; }
 
         [DllImport("KERNEL32.DLL", EntryPoint = "RtlZeroMemory")]
         private static extern bool ZeroMemory(IntPtr Destination, int length);
@@ -24,14 +24,7 @@ namespace P2P_File_Sharing
             //TODO use internal methods to check if file is encrypted or not
             _fileName = fileData.FileLocation;
             _password = fileData.FileHash;
-            if (IsAlreadyEncrypted())
-            {
-                FileInfo fileInfo = new FileInfo(_fileName);
-
-                _encryptedFilename = _fileName.Substring(0, _fileName.Length - (fileInfo.Extension.Length + 1)) + ".aes";
-            }
-            var fileHash = new FileHash(_fileName);
-            _encryptedHash = fileHash.GenerateFileHash();
+            _encryptedHash = _fileName + ".aes";
         }
 
         private static byte[] GenerateRandomSalt()
@@ -87,12 +80,15 @@ namespace P2P_File_Sharing
                 }
 
                 fsIn.Close();
+                var hasher = new FileHash(_encryptedFilename);
                 StatusMessage.PostToActivityBox("File encrypted.", MessageType.INFORMATION);
                 //TODO File.Delete(_fileName);
             }
             catch (Exception ex)
             {
                 StatusMessage.PostToActivityBox("In FileEncrypt: " + ex, MessageType.ERROR);
+                StatusMessage logger = new StatusMessage();
+                logger.Log("FileEncryptor.FileEncrypt: " + ex);
             }
             finally
             {
@@ -104,6 +100,7 @@ namespace P2P_File_Sharing
 
         public void FileDecrypt()
         {
+            var logger = new StatusMessage();
             if (!IsAlreadyEncrypted())
                 throw new Exception("File wasn't encrypted.");
 
@@ -143,10 +140,12 @@ namespace P2P_File_Sharing
             catch (CryptographicException ex_CryptographicException)
             {
                 StatusMessage.PostToActivityBox("CryptographicException error: " + ex_CryptographicException.Message, MessageType.ERROR);
+                logger.Log("FileEncryptor.FileDecrypt: " + ex_CryptographicException);
             }
             catch (Exception ex)
             {
                 StatusMessage.PostToActivityBox("File Decryption: " + ex.Message, MessageType.ERROR);
+                logger.Log("FileEncryptor.FileDecrypt Catch2: " + ex);
             }
 
             try
@@ -156,6 +155,7 @@ namespace P2P_File_Sharing
             catch (Exception ex)
             {
                 StatusMessage.PostToActivityBox("Error closing CryptoStream: " + ex.Message, MessageType.ERROR);
+                logger.Log("FileEncryptor.FileDecrypt Try2: " + ex);
             }
             finally
             {

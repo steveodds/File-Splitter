@@ -118,7 +118,6 @@
     <Compile Include="Store File.xaml.cs">
       <DependentUpon>Store File.xaml</DependentUpon>
     </Compile>
-    <Compile Include="StoreFile.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

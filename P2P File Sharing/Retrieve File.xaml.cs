@@ -24,7 +24,7 @@ namespace P2P_File_Sharing
             var filename = lbStoredFiles.SelectedItem.ToString();
             if (filename != null)
             {
-                var fileDetails = DBController.ReadFileDetails(filename);
+                var fileDetails = DBController.ReadEncryptedFileDetails(filename);
                 var decryptFile = new FileEncryptor(fileDetails);
                 if (!decryptFile.IsAlreadyEncrypted())
                 {

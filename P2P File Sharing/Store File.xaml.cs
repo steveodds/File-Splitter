@@ -23,19 +23,30 @@ namespace P2P_File_Sharing
             var filename = PickFile();
             var fileDetails = new FileInfo(filename);
             var fileObject = new EFile(fileDetails);
-            DBController.WriteToDB("files", fileObject);
-            var encryptFile = new FileEncryptor(fileObject);
-            try
+            var temp = DBController.ReadFileDetails(fileObject.FileLocation).FileHash;
+            if (fileObject.FileHash != temp)
             {
-                encryptFile.FileEncrypt();
-                fileObject.EncryptedHash = encryptFile.EncryptedHash;
-                fileObject.StoredDateTime = DateTime.Now;
-                DBController.WriteToDB("storedfiles", fileObject);
+                DBController.WriteToDB("files", fileObject);
+                var encryptFile = new FileEncryptor(fileObject);
+                try
+                {
+                    encryptFile.FileEncrypt();
+                    fileObject.EncryptedHash = encryptFile.EncryptedHash; //TODO Check why it's null
+                    fileObject.StoredDateTime = DateTime.Now;
+                    DBController.WriteToDB("storedfiles", fileObject);
+                }
+                catch (Exception ex)
+                {
+                    StatusMessage.PostToActivityBox("Attempting Encryption: " + ex.ToString(), MessageType.ERROR);
+                    StatusMessage logger = new StatusMessage();
+                    logger.Log("Save button: " + ex);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                StatusMessage.PostToActivityBox("Attempting Encryption: " + ex.ToString(), MessageType.ERROR);
+                MessageBox.Show("Error, file was already saved.", "Error encrypting file", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            
         }
 
         private string PickFile()
