@@ -5,15 +5,12 @@ using System.Data.SQLite;
 
 namespace P2P_File_Sharing
 {
-    public class DBController
+    public static class DBController
     {
-        protected static readonly SQLiteConnection _dbCon = new SQLiteConnection("Data Source=ds.sqlite;Version=3;");
+        private static readonly SQLiteConnection _dbCon = new SQLiteConnection("Data Source=ds.sqlite;Version=3;");
         private static readonly string _dbFile = $@"{Directory.GetCurrentDirectory()}\ds.sqlite";
 
-        public DBController()
-        {
-            CreateDB();
-        }
+
 
         public static bool Exists() => File.Exists(_dbFile);
 
@@ -78,19 +75,11 @@ namespace P2P_File_Sharing
             switch (tableName.ToLowerInvariant())
             {
                 case "files":
-                    using (SQLiteCommand sQLiteCommand = new SQLiteCommand(dbConIN))
-                    {
-                        //TODO Add insertion commands
-                        sQLiteCommand.CommandText = $"INSERT INTO files VALUES ('{fileDetails.FileHash}', '{fileDetails.FileName}', false)";
-                        sQLiteCommand.ExecuteNonQuery();
-                    }
+                    WriteToTables(tableName, fileDetails.ToStringArray());
                     break;
 
                 case "storedfiles":
-                    using (SQLiteCommand sQLiteCommand = new SQLiteCommand(dbConIN))
-                    {
-                        //TODO Add insertion commands
-                    }
+                    WriteToTables(tableName, fileDetails.ToStringArrayEncrypted());
                     break;
 
                 default:
@@ -100,20 +89,109 @@ namespace P2P_File_Sharing
             dbConIN.Close();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "<Pending>")]
+        private static void WriteToTables(string table, string[] parameters)
+        {
+            if (string.IsNullOrEmpty(table))
+                throw new ArgumentNullException("DB commands: No table name was given.");
+            if (parameters.Length < 3)
+                throw new ArgumentNullException("DB commands: Not enough arguments were given.");
 
+            _dbCon.Open();
+            try
+            {
+                using (SQLiteCommand sQLiteCommand = new SQLiteCommand(_dbCon))
+                {
+                    //TODO Add insertion commands
+                    sQLiteCommand.CommandText =
+                        $@"
+                        INSERT INTO {table} 
+                        VALUES ($param1, $param2, $param3)
+                    ";
+                    sQLiteCommand.Parameters.AddWithValue("$param1", parameters[0]);
+                    sQLiteCommand.Parameters.AddWithValue("$param2", parameters[1]);
+                    sQLiteCommand.Parameters.AddWithValue("$param3", parameters[2]);
+                    sQLiteCommand.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage.PostToActivityBox($"Writing to {table} table: " + ex, MessageType.ERROR);
+                StatusMessage.Log($"DBController.WriteToTables with {table} as the table and {parameters.Length} parameters. Exception: \n" + ex);
+            }
+            finally
+            {
+                _dbCon.Close();
+            }
+            _dbCon.Close();
+        }
 
-        public static void ReadFromDB(string tablename, string column, string value)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "<Pending>")]
+        private static string[] ReadFromDB(string tablename, string column, string value)
         {
             //TODO Add code that reads from DB
+            var detailsFromDB = new string[4];
+            detailsFromDB[0] = tablename;
+            _dbCon.Open();
+            try
+            {
+                using (SQLiteCommand command = new SQLiteCommand(_dbCon))
+                {
+                    command.CommandText =
+                        $@"
+                        SELECT * FROM {tablename} WHERE $column = $value
+                    ";
+                    command.Parameters.AddWithValue("$column", column);
+                    command.Parameters.AddWithValue("$value", value);
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            detailsFromDB[1] = reader.GetString(0);
+                            detailsFromDB[2] = reader.GetString(1);
+                            detailsFromDB[3] = reader.GetString(2);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage.PostToActivityBox("File deails in DB: " + ex, MessageType.ERROR);
+                StatusMessage.Log($"DBController.ReadFromDB with {tablename} as the table and {column} as the column. Exception: \n" + ex);
+            }
+            finally
+            {
+                _dbCon.Close();
+            }
+            _dbCon.Close();
+            return detailsFromDB;
         }
 
         public static EFile ReadFileDetails(string file)
         {
             //TODO Read file details and add them to the proper EFile parameters.
-            
+            var filehash = new FileHash(file);
+            var hash = filehash.GenerateFileHash();
+            var encryptedFile = ReadFromDB("storedfiles", "filehash", hash);
+            var fileDetails = new EFile()
+            {
+                FileHash = encryptedFile[1],
+                EncryptedHash = encryptedFile[2],
+                StoredDateTime = DateTime.Parse(encryptedFile[3])
+            };
+            var standardFile = ReadFromDB("files", "filehash", hash);
+            fileDetails.FileName = standardFile[2];
+            fileDetails.IsStored = Convert.ToBoolean(standardFile[3]);
 
+            return fileDetails;
+        }
 
-            return new EFile();
+        public static bool IsFileInDB(string filename)
+        {
+            //TODO Check if filename is in DB
+            var filesHash = new FileHash(filename);
+            var temp = ReadFromDB("storedfiles", "filehash", filesHash.GenerateFileHash());
+            return !string.IsNullOrEmpty(temp[1]);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Windows;
 
 namespace P2P_File_Sharing
@@ -26,6 +27,17 @@ namespace P2P_File_Sharing
                     _mainWindow.tbAppActivity.Text = "MESSAGE: " + message;
                     break;
             }
+        }
+
+        public static void Log(string message)
+        {
+            if (!File.Exists("errors.log"))
+                File.Create("errors.log");
+
+            StreamWriter writer = new StreamWriter("errors.log", true);
+            writer.WriteLine(message);
+            writer.Flush();
+            writer.Close();
         }
     }
 }

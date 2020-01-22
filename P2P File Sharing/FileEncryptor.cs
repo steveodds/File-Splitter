@@ -13,7 +13,9 @@ namespace P2P_File_Sharing
         private readonly string _encryptedHash;
         private readonly string _password;
         private readonly string _encryptedFilename;
+        private string encryptedHash;
 
+        public string EncryptedHash { get => encryptedHash; private set => encryptedHash = _encryptedHash; }
 
         [DllImport("KERNEL32.DLL", EntryPoint = "RtlZeroMemory")]
         private static extern bool ZeroMemory(IntPtr Destination, int length);
@@ -22,12 +24,14 @@ namespace P2P_File_Sharing
             //TODO use internal methods to check if file is encrypted or not
             _fileName = fileData.FileLocation;
             _password = fileData.FileHash;
-            if (fileData.IsStored)
+            if (IsAlreadyEncrypted())
             {
                 FileInfo fileInfo = new FileInfo(_fileName);
 
                 _encryptedFilename = _fileName.Substring(0, _fileName.Length - (fileInfo.Extension.Length + 1)) + ".aes";
             }
+            var fileHash = new FileHash(_fileName);
+            _encryptedHash = fileHash.GenerateFileHash();
         }
 
         private static byte[] GenerateRandomSalt()
@@ -100,7 +104,7 @@ namespace P2P_File_Sharing
 
         public void FileDecrypt()
         {
-            if (IsAlreadyDecrypted())
+            if (!IsAlreadyEncrypted())
                 throw new Exception("File wasn't encrypted.");
 
 
@@ -164,17 +168,11 @@ namespace P2P_File_Sharing
 
 
         /* Checker methods */
-        public bool IsAlreadyDecrypted()
-        {
-            //TODO check state in db
 
-            return false;
-        }
         public bool IsAlreadyEncrypted()
         {
             //TODO check state in db
-
-            return false;
+            return DBController.IsFileInDB(_fileName);
         }
     }
 }

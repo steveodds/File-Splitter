@@ -107,7 +107,6 @@
     </ApplicationDefinition>
     <Compile Include="DBController.cs" />
     <Compile Include="EFile.cs" />
-    <Compile Include="FileDBActions.cs" />
     <Compile Include="FileEncryptor.cs" />
     <Compile Include="FileHash.cs" />
     <Compile Include="MessageType.cs" />

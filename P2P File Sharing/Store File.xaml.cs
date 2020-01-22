@@ -27,10 +27,10 @@ namespace P2P_File_Sharing
             var encryptFile = new FileEncryptor(fileObject);
             try
             {
-                if (!encryptFile.IsAlreadyEncrypted())
-                {
-                    encryptFile.FileEncrypt();
-                }
+                encryptFile.FileEncrypt();
+                fileObject.EncryptedHash = encryptFile.EncryptedHash;
+                fileObject.StoredDateTime = DateTime.Now;
+                DBController.WriteToDB("storedfiles", fileObject);
             }
             catch (Exception ex)
             {

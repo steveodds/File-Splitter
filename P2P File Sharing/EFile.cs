@@ -13,6 +13,8 @@ namespace P2P_File_Sharing
         public string FileLocation { get; set; }
         public string FileHash { get; set; }
         public bool IsStored { get; set; }
+        public string EncryptedHash { get; set; }
+        public DateTime StoredDateTime { get; set; }
 
         public EFile()
         {
@@ -22,7 +24,7 @@ namespace P2P_File_Sharing
         {
             FileName = fileInfo.Name;
             FileLocation = fileInfo.FullName;
-            IsStored = IsFileInDB(FileName);
+            IsStored = IsFileInDB(FileLocation);
             FileHash = GenerateHash(FileLocation);
         }
 
@@ -35,8 +37,27 @@ namespace P2P_File_Sharing
 
         private bool IsFileInDB(string fileName)
         {
-            return FileDBActions.IsFileInDB(fileName);
+            return DBController.IsFileInDB(fileName);
         }
         
+        public string[] ToStringArray()
+        {
+            var fileDetailsAsArray = new string[3];
+            fileDetailsAsArray[0] = FileHash;
+            fileDetailsAsArray[1] = FileLocation;
+            fileDetailsAsArray[2] = IsStored.ToString();
+
+            return fileDetailsAsArray;
+        }
+
+        public string[] ToStringArrayEncrypted()
+        {
+            var fileDetailsAsArray = new string[3];
+            fileDetailsAsArray[0] = FileHash;
+            fileDetailsAsArray[1] = EncryptedHash;
+            fileDetailsAsArray[2] = StoredDateTime.ToString();
+
+            return fileDetailsAsArray;
+        }
     }
 }
