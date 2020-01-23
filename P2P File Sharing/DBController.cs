@@ -138,19 +138,25 @@ namespace P2P_File_Sharing
             {
                 using (SQLiteCommand command = new SQLiteCommand(_dbCon))
                 {
-                    command.CommandText =
-                        $@"
-                        SELECT * FROM {tablename} WHERE $column = $value
-                    ";
+                    command.CommandText = $"SELECT * FROM {tablename} WHERE $column = '$value'";
                     command.Parameters.AddWithValue("$column", column);
                     command.Parameters.AddWithValue("$value", value);
+                    //command.ExecuteNonQuery();
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
-                        while (reader.Read())
+                        try
                         {
-                            detailsFromDB[1] = reader.GetString(0);
-                            detailsFromDB[2] = reader.GetString(1);
-                            detailsFromDB[3] = reader.GetString(2);
+                            while (reader.Read())
+                            {
+                                detailsFromDB[1] = reader.GetString(0);
+                                detailsFromDB[2] = reader.GetString(1);
+                                detailsFromDB[3] = reader.GetValue(3).ToString();
+                            }
+                        }
+                        catch (Exception exx)
+                        {
+                            StatusMessage statusMessage = new StatusMessage();
+                            statusMessage.Log("Checking reader: " + exx);
                         }
                     }
                 }
