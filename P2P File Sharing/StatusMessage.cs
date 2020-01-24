@@ -33,18 +33,15 @@ namespace P2P_File_Sharing
 
         public void Log(string message)
         {
-            if (!File.Exists("errors.log"))
-                File.Create("errors.log");
-
-            StreamWriter writer = new StreamWriter("errors.log", true);
             StringBuilder builder = new StringBuilder();
             var timestamp = DateTime.Now.ToString();
             builder.Append(timestamp);
             builder.Append(" :=> ");
             builder.Append(message);
-            writer.WriteLine(builder);
-            writer.Flush();
-            writer.Close();
+            using (StreamWriter writer = new StreamWriter("errors.log", true))
+            {
+                writer.WriteLine(builder);
+            }
         }
     }
 }
