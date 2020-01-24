@@ -130,7 +130,6 @@ namespace P2P_File_Sharing
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "<Pending>")]
         private static string[] ReadFromDB(string tablename, string column, string value)
         {
-            //TODO Add code that reads from DB
             var detailsFromDB = new string[4];
             detailsFromDB[0] = tablename;
             _dbCon.Open();

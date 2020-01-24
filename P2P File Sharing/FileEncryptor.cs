@@ -19,7 +19,6 @@ namespace P2P_File_Sharing
         private static extern bool ZeroMemory(IntPtr Destination, int length);
         public FileEncryptor(EFile fileData)
         {
-            //TODO use internal methods to check if file is encrypted or not
             _fileName = fileData.FileLocation;
             _password = fileData.FileHash;
             _encryptedFilename = _fileName + ".aes";
@@ -170,7 +169,6 @@ namespace P2P_File_Sharing
 
         public bool IsAlreadyEncrypted()
         {
-            //TODO check state in db
             return DBController.IsFileInDB(_fileName);
         }
     }

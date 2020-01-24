@@ -19,7 +19,6 @@ namespace P2P_File_Sharing
 
         private void BtnSaveFileSAVE_Click(object sender, RoutedEventArgs e)
         {
-            //TODO Complete the program flow
             var filename = PickFile();
             var fileDetails = new FileInfo(filename);
             var fileObject = new EFile(fileDetails);
@@ -31,7 +30,7 @@ namespace P2P_File_Sharing
                 try
                 {
                     encryptFile.FileEncrypt();
-                    fileObject.EncryptedHash = encryptFile.EncryptedHash; //TODO Check why it's null
+                    fileObject.EncryptedHash = encryptFile.EncryptedHash;
                     fileObject.StoredDateTime = DateTime.Now;
                     DBController.WriteToDB("storedfiles", fileObject);
                 }
