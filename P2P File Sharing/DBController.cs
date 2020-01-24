@@ -138,9 +138,9 @@ namespace P2P_File_Sharing
             {
                 using (SQLiteCommand command = new SQLiteCommand(_dbCon))
                 {
-                    command.CommandText = $"SELECT * FROM {tablename} WHERE $column = '$value'";
-                    command.Parameters.AddWithValue("$column", column);
-                    command.Parameters.AddWithValue("$value", value);
+                    command.CommandText = $"SELECT * FROM {tablename}"; /*WHERE filehash = 'e67bbf89219be181d20f3d41b8e80f1f'";*/
+                    //command.Parameters.AddWithValue("@column", column);
+                    //command.Parameters.AddWithValue("@value", value);
                     //command.ExecuteNonQuery();
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {

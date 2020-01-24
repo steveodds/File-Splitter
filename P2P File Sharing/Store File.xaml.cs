@@ -23,7 +23,7 @@ namespace P2P_File_Sharing
             var filename = PickFile();
             var fileDetails = new FileInfo(filename);
             var fileObject = new EFile(fileDetails);
-            var temp = DBController.ReadFileDetails(fileObject.FileLocation).FileLocation;
+            var temp = DBController.ReadFileDetails(fileObject.FileLocation).FileName;
             if (fileObject.FileLocation != temp)
             {
                 DBController.WriteToDB("files", fileObject);
