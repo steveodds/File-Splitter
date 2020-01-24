@@ -150,7 +150,7 @@ namespace P2P_File_Sharing
                             {
                                 detailsFromDB[1] = reader.GetString(0);
                                 detailsFromDB[2] = reader.GetString(1);
-                                detailsFromDB[3] = reader.GetValue(3).ToString();
+                                detailsFromDB[3] = (string) reader.GetValue(2);
                             }
                         }
                         catch (Exception exx)

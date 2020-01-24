@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 
 namespace P2P_File_Sharing
@@ -35,7 +37,12 @@ namespace P2P_File_Sharing
                 File.Create("errors.log");
 
             StreamWriter writer = new StreamWriter("errors.log", true);
-            writer.WriteLine(message);
+            StringBuilder builder = new StringBuilder();
+            var timestamp = DateTime.Now.ToString();
+            builder.Append(timestamp);
+            builder.Append(" :=> ");
+            builder.Append(message);
+            writer.WriteLine(builder);
             writer.Flush();
             writer.Close();
         }
