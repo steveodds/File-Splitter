@@ -33,8 +33,8 @@ namespace P2P_File_Sharing
                     fileObject.EncryptedHash = encryptFile.EncryptedHash;
                     fileObject.StoredDateTime = DateTime.Now;
                     DBController.WriteToDB("storedfiles", fileObject);
-                    //TODO Update file state in DB after successful encryption
                     DBController.UpdateDBState(fileObject.FileHash);
+                    StatusMessage.PostToRecentsBox(fileObject);
                 }
                 catch (Exception ex)
                 {

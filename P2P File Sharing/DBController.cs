@@ -63,6 +63,11 @@ namespace P2P_File_Sharing
                 StatusMessage status = new StatusMessage();
                 status.Log($"Failed to write file state to file table: {dbUpdateEx}");
             }
+            finally
+            {
+                _dbCon.Close();
+            }
+            _dbCon.Close();
         }
 
         private static bool HasTables()

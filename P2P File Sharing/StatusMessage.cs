@@ -43,5 +43,10 @@ namespace P2P_File_Sharing
                 writer.WriteLine(builder);
             }
         }
+
+        internal static void PostToRecentsBox(EFile fileObject)
+        {
+            _mainWindow.tbFileList.Text += $"{fileObject.FileName}:\t{fileObject.FileLocation}\n";
+        }
     }
 }
