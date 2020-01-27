@@ -14,8 +14,26 @@ namespace P2P_File_Sharing
             this.Left = Application.Current.MainWindow.Left + Application.Current.MainWindow.ActualWidth;
             this.Top = Application.Current.MainWindow.Top;
 
-            lbStoredFiles.Items.Add("clientlist.doc");
-            lbStoredFiles.Items.Add("widgets_android.txt");
+            DisplaySavedFiles();
+        }
+
+        private void DisplaySavedFiles()
+        {
+            try
+            {
+                var savedFiles = DBController.LoadSavedFiles();
+                foreach (var file in savedFiles)
+                {
+                    lbStoredFiles.Items.Add(file.FileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage.PostToActivityBox("Could not fetch stored files.", MessageType.ERROR);
+                var logger = new StatusMessage();
+                logger.Log($"Could not get stored files: {ex}");
+                logger.Log($"Trace: {ex.StackTrace}");
+            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

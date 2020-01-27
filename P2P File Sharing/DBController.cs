@@ -2,6 +2,7 @@
 using System.Linq;
 using System.IO;
 using System.Data.SQLite;
+using System.Collections.Generic;
 
 namespace P2P_File_Sharing
 {
@@ -171,7 +172,7 @@ namespace P2P_File_Sharing
                             {
                                 detailsFromDB[1] = reader.GetString(0);
                                 detailsFromDB[2] = reader.GetString(1);
-                                detailsFromDB[3] = (string) reader.GetValue(2);
+                                detailsFromDB[3] = (string)reader.GetValue(2);
                             }
                         }
                         catch (Exception exx)
@@ -194,6 +195,67 @@ namespace P2P_File_Sharing
             }
             _dbCon.Close();
             return detailsFromDB;
+        }
+
+        private static List<EFile> ReadAllStoredFiles()
+        {
+            var storedFilesList = new List<EFile>();
+            _dbCon.Open();
+
+            try
+            {
+                using (var command = new SQLiteCommand(_dbCon))
+                {
+                    command.CommandText = "SELECT * FROM files WHERE filestate='true' LIMIT 10";
+                    using (var reader = command.ExecuteReader())
+                    {
+                        try
+                        {
+                            while (reader.Read())
+                            {
+                                var filename = reader.GetString(1);
+                                var fileInfo = new FileInfo(filename);
+                                storedFilesList.Add(new EFile()
+                                {
+                                    FileName = fileInfo.Name,
+                                    FileLocation = filename
+                                });
+                            }
+                        }
+                        catch (Exception readerEx)
+                        {
+                            StatusMessage.PostToActivityBox("Failed to read file list from DB.", MessageType.ERROR);
+                            var loggerReader = new StatusMessage();
+                            loggerReader.Log($"DBController.ReadAllStoredFiles: {readerEx}");
+                        }
+                    }
+                }
+            }
+            catch (Exception readFromDB)
+            {
+                StatusMessage.PostToActivityBox("Failed to fetch file list from DB.", MessageType.ERROR);
+                var logger = new StatusMessage();
+                logger.Log($"DBController.ReadAllStoredFiles: {readFromDB}");
+            }
+            finally
+            {
+                _dbCon.Close();
+            }
+
+            _dbCon.Close();
+
+            return storedFilesList;
+        }
+
+
+        public static List<EFile> LoadSavedFiles()
+        {
+            List<EFile> savedFiles = new List<EFile>();
+            savedFiles = ReadAllStoredFiles();
+            if (savedFiles.Count < 1)
+                throw new Exception("No saved files were found");
+
+            return savedFiles;
         }
 
         public static EFile ReadFileDetails(string filename)
