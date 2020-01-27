@@ -67,7 +67,7 @@ namespace P2P_File_Sharing
             if (filename != null && savedFiles != null)
             {
                 EFile fileDetails = LoadData(filename);
-
+                fileDetails.FileName += ".aes";
                 var decryptFile = new FileEncryptor(fileDetails);
                 if (!decryptFile.IsAlreadyEncrypted())
                 {
@@ -97,7 +97,8 @@ namespace P2P_File_Sharing
         {
             var file = savedFiles.Find(x => x.FileName.Contains(filename)).FileLocation;
             var fileDetails = DBController.ReadFileDetails(file);
-            var fullFileDetails = DBController.ReadEncryptedFileDetails(file);
+            var genHash = new FileHash($"{file}.aes");
+            var fullFileDetails = DBController.ReadEncryptedFileDetails(genHash.GenerateFileHash());
             fullFileDetails.FileLocation = fileDetails.FileLocation;
             fullFileDetails.FileName = fileDetails.FileName;
             fullFileDetails.IsStored = fileDetails.IsStored;

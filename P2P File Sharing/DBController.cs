@@ -198,7 +198,7 @@ namespace P2P_File_Sharing
                             {
                                 detailsFromDB[1] = reader.GetString(0);
                                 detailsFromDB[2] = reader.GetString(1);
-                                detailsFromDB[3] = (string)reader.GetValue(2);
+                                detailsFromDB[3] = reader.GetValue(2).ToString();
                             }
                         }
                         catch (Exception exx)
@@ -285,7 +285,7 @@ namespace P2P_File_Sharing
         public static EFile ReadFileDetails(string filename)
         {
             var filehash = new FileHash(filename);
-            var normalFile = ReadFromDB("files", "filehash", filehash.GenerateFileHash());
+            var normalFile = ReadFromDB("files", "filename", filename);
             var filedetails = new EFile()
             {
                 FileHash = normalFile[1],
@@ -293,17 +293,18 @@ namespace P2P_File_Sharing
                 IsStored = Convert.ToBoolean(normalFile[3])
             };
 
-            var info = new FileInfo(filedetails.FileLocation);
-            filedetails.FileName = info.Name;
+            if (!string.IsNullOrEmpty(filedetails.FileLocation))
+            {
+                var info = new FileInfo(filedetails.FileLocation);
+                filedetails.FileName = info.Name;
+            }
 
             return filedetails;
         }
 
-        public static EFile ReadEncryptedFileDetails(string file)
+        public static EFile ReadEncryptedFileDetails(string encryptedHash)
         {
-            var filehash = new FileHash(file);
-            var hash = filehash.GenerateFileHash();
-            var encryptedFile = ReadFromDB("storedfiles", "filehash", hash);
+            var encryptedFile = ReadFromDB("storedfiles", "encryptedhash", encryptedHash);
             var fileDetails = new EFile()
             {
                 FileHash = encryptedFile[1],
@@ -316,9 +317,9 @@ namespace P2P_File_Sharing
 
         public static bool IsFileInDB(string filename)
         {
-            var filesHash = new FileHash(filename);
-            var temp = ReadFromDB("storedfiles", "filehash", filesHash.GenerateFileHash());
-            return !string.IsNullOrEmpty(temp[1]);
+            //var filesHash = new FileHash(filename);
+            var temp = ReadFromDB("files", "filename", filename);
+            return Convert.ToBoolean(temp[3]);
         }
     }
 }
