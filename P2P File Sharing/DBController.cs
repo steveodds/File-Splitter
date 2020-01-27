@@ -46,14 +46,15 @@ namespace P2P_File_Sharing
             }
         }
 
-        internal static void UpdateDBState(string fileHash)
+        internal static void UpdateDBState(string fileHash, string newState)
         {
             _dbCon.Open();
             try
             {
                 using (var command = new SQLiteCommand(_dbCon))
                 {
-                    command.CommandText = "UPDATE files SET filestate='true' WHERE filehash=@filehash";
+                    command.CommandText = "UPDATE files SET filestate=@state WHERE filehash=@filehash";
+                    command.Parameters.AddWithValue("@state", newState);
                     command.Parameters.AddWithValue("@filehash", fileHash);
                     command.ExecuteNonQuery();
                 }
@@ -63,6 +64,31 @@ namespace P2P_File_Sharing
                 StatusMessage.PostToActivityBox("Failed to update file save state.", MessageType.ERROR);
                 StatusMessage status = new StatusMessage();
                 status.Log($"Failed to write file state to file table: {dbUpdateEx}");
+            }
+            finally
+            {
+                _dbCon.Close();
+            }
+            _dbCon.Close();
+        }
+
+        internal static void RemoveSavedFile(string hash)
+        {
+            _dbCon.Open();
+            try
+            {
+                using (SQLiteCommand command = new SQLiteCommand(_dbCon))
+                {
+                    command.CommandText = "DELETE FROM storedfiles WHERE filehash=@hash";
+                    command.Parameters.AddWithValue("@hash", hash);
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception deleteEx)
+            {
+                StatusMessage.PostToActivityBox("Failed to delete retrieved file record.", MessageType.ERROR);
+                var logger = new StatusMessage();
+                logger.Log($"DBController.RemoveSavedFile: Could not delete saved file record: {deleteEx}");
             }
             finally
             {
@@ -265,9 +291,12 @@ namespace P2P_File_Sharing
             var filedetails = new EFile()
             {
                 FileHash = normalFile[1],
-                FileName = normalFile[2],
+                FileLocation = normalFile[2],
                 IsStored = Convert.ToBoolean(normalFile[3])
             };
+
+            var info = new FileInfo(filedetails.FileLocation);
+            filedetails.FileName = info.Name;
 
             return filedetails;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace P2P_File_Sharing
@@ -8,6 +9,8 @@ namespace P2P_File_Sharing
     /// </summary>
     public partial class Retrieve_File : Window
     {
+        private List<EFile> savedFiles;
+
         public Retrieve_File()
         {
             InitializeComponent();
@@ -19,9 +22,10 @@ namespace P2P_File_Sharing
 
         private void DisplaySavedFiles()
         {
+            lbStoredFiles.Items.Clear();
             try
             {
-                var savedFiles = DBController.LoadSavedFiles();
+                savedFiles = DBController.LoadSavedFiles();
                 foreach (var file in savedFiles)
                 {
                     lbStoredFiles.Items.Add(file.FileName);
@@ -40,18 +44,44 @@ namespace P2P_File_Sharing
         {
             //TODO Refactor
             var filename = lbStoredFiles.SelectedItem.ToString();
-            if (filename != null)
+            if (filename != null && savedFiles != null)
             {
-                var fileDetails = DBController.ReadEncryptedFileDetails(filename);
+                EFile fileDetails = LoadData(filename);
+
                 var decryptFile = new FileEncryptor(fileDetails);
                 if (!decryptFile.IsAlreadyEncrypted())
                 {
+                    MessageBox.Show("The file isn't encrypted.", "File Already Encrypted", MessageBoxButton.OK);
                     StatusMessage.PostToActivityBox("Cannot decrypt file: The file was already decrypted", MessageType.ERROR);
-                    throw new Exception("File is already decrypted");
                 }
-                decryptFile.FileDecrypt();
-                //TODO Make sure DB is updated
+
+                try
+                {
+                    decryptFile.FileDecrypt();
+                    DBController.UpdateDBState(fileDetails.FileHash, "false");
+                    DBController.RemoveSavedFile(fileDetails.FileHash);
+                    DisplaySavedFiles();
+                    StatusMessage.PostToActivityBox("File retrieved.", MessageType.INFORMATION);
+                    MessageBox.Show("File has been successfully retireved!", "File Retrieved", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception decryptEx)
+                {
+                    StatusMessage.PostToActivityBox("Failed to decrypt file!", MessageType.ERROR);
+                    var logger = new StatusMessage();
+                    logger.Log($"Retrieve File Button: {decryptEx}");
+                }
             }
+        }
+
+        private EFile LoadData(string filename)
+        {
+            var file = savedFiles.Find(x => x.FileName.Contains(filename)).FileLocation;
+            var fileDetails = DBController.ReadFileDetails(file);
+            var fullFileDetails = DBController.ReadEncryptedFileDetails(file);
+            fullFileDetails.FileLocation = fileDetails.FileLocation;
+            fullFileDetails.FileName = fileDetails.FileName;
+            fullFileDetails.IsStored = fileDetails.IsStored;
+            return fullFileDetails;
         }
     }
 }
