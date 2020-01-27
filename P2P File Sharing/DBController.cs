@@ -45,7 +45,26 @@ namespace P2P_File_Sharing
             }
         }
 
-        
+        internal static void UpdateDBState(string fileHash)
+        {
+            _dbCon.Open();
+            try
+            {
+                using (var command = new SQLiteCommand(_dbCon))
+                {
+                    command.CommandText = "UPDATE files SET filestate='true' WHERE filehash=@filehash";
+                    command.Parameters.AddWithValue("@filehash", fileHash);
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception dbUpdateEx)
+            {
+                StatusMessage.PostToActivityBox("Failed to update file save state.", MessageType.ERROR);
+                StatusMessage status = new StatusMessage();
+                status.Log($"Failed to write file state to file table: {dbUpdateEx}");
+            }
+        }
+
         private static bool HasTables()
         {
             object tempcheck;
