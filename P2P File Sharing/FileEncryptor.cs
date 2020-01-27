@@ -78,7 +78,7 @@ namespace P2P_File_Sharing
 
                 fsIn.Close();
                 StatusMessage.PostToActivityBox("File encrypted.", MessageType.INFORMATION);
-                //TODO File.Delete(_fileName);
+                File.Delete(_fileName);
             }
             catch (Exception ex)
             {

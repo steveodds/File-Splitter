@@ -278,8 +278,6 @@ namespace P2P_File_Sharing
         {
             List<EFile> savedFiles = new List<EFile>();
             savedFiles = ReadAllStoredFiles();
-            if (savedFiles.Count < 1)
-                throw new Exception("No saved files were found");
 
             return savedFiles;
         }

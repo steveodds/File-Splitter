@@ -10,6 +10,7 @@ namespace P2P_File_Sharing
     public partial class Retrieve_File : Window
     {
         private List<EFile> savedFiles;
+        private bool isListPopulated;
 
         public Retrieve_File()
         {
@@ -17,19 +18,37 @@ namespace P2P_File_Sharing
             this.Left = Application.Current.MainWindow.Left + Application.Current.MainWindow.ActualWidth;
             this.Top = Application.Current.MainWindow.Top;
 
-            DisplaySavedFiles();
+            isListPopulated = ContainsSavedFiles();
+            Loaded += Retrieve_File_Loaded;
         }
 
-        private void DisplaySavedFiles()
+        private void Retrieve_File_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (!isListPopulated)
+            {
+                this.Close();
+            }
+        }
+
+        private bool ContainsSavedFiles()
         {
             lbStoredFiles.Items.Clear();
             try
             {
                 savedFiles = DBController.LoadSavedFiles();
-                foreach (var file in savedFiles)
+                if (savedFiles.Count > 0)
                 {
-                    lbStoredFiles.Items.Add(file.FileName);
+                    foreach (var file in savedFiles)
+                    {
+                        lbStoredFiles.Items.Add(file.FileName);
+                    }
                 }
+                else
+                {
+                    MessageBox.Show("You haven't saved any files yet.", "No Saved Files", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    return false;
+                }
+
             }
             catch (Exception ex)
             {
@@ -38,6 +57,7 @@ namespace P2P_File_Sharing
                 logger.Log($"Could not get stored files: {ex}");
                 logger.Log($"Trace: {ex.StackTrace}");
             }
+            return true;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -60,7 +80,7 @@ namespace P2P_File_Sharing
                     decryptFile.FileDecrypt();
                     DBController.UpdateDBState(fileDetails.FileHash, "false");
                     DBController.RemoveSavedFile(fileDetails.FileHash);
-                    DisplaySavedFiles();
+                    ContainsSavedFiles();
                     StatusMessage.PostToActivityBox("File retrieved.", MessageType.INFORMATION);
                     MessageBox.Show("File has been successfully retireved!", "File Retrieved", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
