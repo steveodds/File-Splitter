@@ -134,6 +134,7 @@ namespace P2P_File_Sharing
                 }
                 StatusMessage.PostToActivityBox("File decrypted", MessageType.INFORMATION);
                 Process.Start(_fileName);
+                File.Delete(_encryptedFilename);
             }
             catch (CryptographicException ex_CryptographicException)
             {
