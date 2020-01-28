@@ -7,33 +7,30 @@
         mc:Ignorable="d"
         Title="P2P File Sharing" Height="463.6" Width="840" Background="#FF2B2B2B" ResizeMode="CanMinimize">
     <Grid>
-        <GroupBox Header="Actions" Height="400" Margin="10,10,0,0" VerticalAlignment="Top" Foreground="#FF8EFFA8" BorderBrush="#FF8EFFA8" HorizontalAlignment="Left" Width="315">
-            <Grid HorizontalAlignment="Left" Height="390" VerticalAlignment="Top" Width="300" Margin="0,0,-2.4,-11.6">
-                <Image HorizontalAlignment="Left" Height="104" Margin="173,65,0,0" VerticalAlignment="Top" Width="117"/>
+        <GroupBox Header="Actions" Height="400" Margin="10,10,0,0" VerticalAlignment="Top" Foreground="#FF8EFFA8" BorderBrush="#FF8EFFA8" HorizontalAlignment="Left" Width="151">
+            <Grid HorizontalAlignment="Left" Height="390" VerticalAlignment="Top" Width="144" Margin="0,0,0,-12.4">
+                <Image HorizontalAlignment="Left" Height="104" Margin="9,226,0,0" VerticalAlignment="Top" Width="117"/>
                 <Image HorizontalAlignment="Left" Height="104" Margin="10,65,0,0" VerticalAlignment="Top" Width="117">
                     <Image.OpacityMask>
                         <ImageBrush ImageSource="C:\Users\steve\Downloads\save-as-512.png"/>
                     </Image.OpacityMask>
                 </Image>
-                <Image HorizontalAlignment="Left" Height="104" Margin="173,230,0,0" VerticalAlignment="Top" Width="117"/>
-                <Image HorizontalAlignment="Left" Height="104" Margin="10,230,0,0" VerticalAlignment="Top" Width="117"/>
                 <Button x:Name="btnSaveFile" Content="Save File" HorizontalAlignment="Left" Height="27" Margin="10,174,0,0" VerticalAlignment="Top" Width="117" Background="#00DDDDDD" Foreground="White" Style="{DynamicResource NoHoverColor}" Click="Button_Click"/>
-                <Button x:Name="btnLeaveNetwork" Content="Settings" HorizontalAlignment="Left" Height="27" Margin="173,339,0,0" VerticalAlignment="Top" Width="117" Foreground="White" Background="#00DDDDDD" Style="{DynamicResource NoHoverColor}" Click="BtnLeaveNetwork_Click"/>
-                <Button x:Name="btnRetrieveAll" Content="Retrieve All Files" HorizontalAlignment="Left" Height="27" Margin="10,339,0,0" VerticalAlignment="Top" Width="117" Background="#00DDDDDD" Foreground="White" Style="{DynamicResource NoHoverColor}" Click="BtnRetrieveAll_Click"/>
-                <Button x:Name="btnRetrieveFile" Content="Retrieve File" HorizontalAlignment="Left" Height="27" Margin="173,174,0,0" VerticalAlignment="Top" Width="117" Foreground="White" Background="#00DDDDDD" Style="{DynamicResource NoHoverColor}" Click="BtnRetrieveFile_Click"/>
+                <Button x:Name="btnRetrieveFile" Content="Retrieve File" HorizontalAlignment="Left" Height="27" Margin="9,335,0,0" VerticalAlignment="Top" Width="117" Foreground="White" Background="#00DDDDDD" Style="{DynamicResource NoHoverColor}" Click="BtnRetrieveFile_Click"/>
                 <Image HorizontalAlignment="Left" Height="90" Margin="21,65,0,0" VerticalAlignment="Top" Width="96" Source="C:\Users\steve\Downloads\save-as-512.png" Stretch="Fill"/>
-                <Image HorizontalAlignment="Left" Height="90" Margin="185,65,0,0" VerticalAlignment="Top" Width="96" Source="C:\Users\steve\Downloads\document-512.png" Stretch="Fill"/>
-                <Image HorizontalAlignment="Left" Height="90" Margin="21,230,0,0" VerticalAlignment="Top" Width="96" Source="C:\Users\steve\Downloads\copy-512.png" Stretch="Fill"/>
-                <Image HorizontalAlignment="Left" Height="90" Margin="185,230,0,0" VerticalAlignment="Top" Width="96" Source="C:\Users\steve\Downloads\exit-2-512.png" Stretch="Fill"/>
+                <Image HorizontalAlignment="Left" Height="90" Margin="21,226,0,0" VerticalAlignment="Top" Width="96" Source="C:\Users\steve\Downloads\document-512.png" Stretch="Fill"/>
             </Grid>
         </GroupBox>
-        <GroupBox Header="Manage files" Height="400" Margin="349,10,10.4,0" VerticalAlignment="Top" BorderBrush="#FFFF8787" Foreground="#FFFF8787"/>
-        <Label Content="Stored Files:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="364,34,0,0" Foreground="White"/>
-        <Ellipse HorizontalAlignment="Left" Height="136" Stroke="#FF00C309" VerticalAlignment="Top" Width="136" Margin="364,65,0,0"/>
-        <Label x:Name="lblDevicesWFragments" Content="0" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="84" Margin="397,91,0,0" VerticalAlignment="Top" Width="71" FontSize="48" FontWeight="Bold" Foreground="#FF00C309"/>
-        <Label Content="Activity:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="364,262,0,0" Foreground="White"/>
-        <TextBlock x:Name="tbAppActivity" HorizontalAlignment="Left" Height="106.04" Margin="364,292.96,0,0" TextWrapping="Wrap" Text="No activity..." VerticalAlignment="Top" Width="433" Foreground="#FFB3B3B3" x:FieldModifier="public"/>
-        <Label Content="Recent Files:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="556,34,0,0" Foreground="White" Width="78.71"/>
-        <TextBlock x:Name="tbFileList" HorizontalAlignment="Left" Height="135" Margin="556,66,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="241" Foreground="#FFB3B3B3" x:FieldModifier="public" d:LayoutOverrides="VerticalAlignment" Padding="5,2,0,0"/>
+        <GroupBox Header="Manage files" Height="400" Margin="179,10,10.6,0" VerticalAlignment="Top" BorderBrush="#FFFF8787" Foreground="#FFFF8787">
+            <Border BorderThickness="1" BorderBrush="White" Margin="0,266.4,260.8,0" Height="108" VerticalAlignment="Top">
+                <TextBlock x:Name="tbAppActivity" HorizontalAlignment="Left" Margin="5,2.6,0,5" TextWrapping="Wrap" Text="No activity..." Width="353" Foreground="#FFB3B3B3" x:FieldModifier="public"/>
+            </Border>
+        </GroupBox>
+        <Label Content="Stored Files:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="194,34,0,0" Foreground="White"/>
+        <Ellipse HorizontalAlignment="Left" Height="136" Stroke="#FF00C309" VerticalAlignment="Top" Width="136" Margin="194,65,0,0"/>
+        <Label x:Name="lblStoredFiles" Content="0" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="84" Margin="227,91,0,0" VerticalAlignment="Top" Width="71" FontSize="48" FontWeight="Bold" Foreground="#FF00C309"/>
+        <Label Content="Activity:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="194,262,0,0" Foreground="White"/>
+        <Label Content="Recent Files:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="567,34,0,0" Foreground="White" Width="79"/>
+        <TextBlock x:Name="tbFileList" HorizontalAlignment="Left" Height="326" Margin="567,65,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="241" Foreground="#FFB3B3B3" x:FieldModifier="public" Padding="5,2,0,0"/>
     </Grid>
 </Window>

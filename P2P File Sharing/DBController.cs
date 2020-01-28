@@ -122,8 +122,6 @@ namespace P2P_File_Sharing
 
         public static void WriteToDB(string tableName, EFile fileDetails)
         {
-            SQLiteConnection dbConIN = new SQLiteConnection("Data Source=ds.sqlite;Version=3;");
-            dbConIN.Open();
             switch (tableName.ToLowerInvariant())
             {
                 case "files":
@@ -135,10 +133,8 @@ namespace P2P_File_Sharing
                     break;
 
                 default:
-                    dbConIN.Close();
                     throw new ArgumentException("The table does not exist");
             }
-            dbConIN.Close();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "<Pending>")]
@@ -232,7 +228,7 @@ namespace P2P_File_Sharing
             {
                 using (var command = new SQLiteCommand(_dbCon))
                 {
-                    command.CommandText = "SELECT * FROM files WHERE filestate='true' LIMIT 10";
+                    command.CommandText = "SELECT * FROM files WHERE filestate='true'";
                     using (var reader = command.ExecuteReader())
                     {
                         try
@@ -320,6 +316,13 @@ namespace P2P_File_Sharing
             //var filesHash = new FileHash(filename);
             var temp = ReadFromDB("files", "filename", filename);
             return Convert.ToBoolean(temp[3]);
+        }
+
+        public static bool ContainsPreviousRecord(string filename)
+        {
+            var temp = ReadFromDB("files", "filename", filename);
+
+            return !string.IsNullOrEmpty(temp[1]);
         }
     }
 }

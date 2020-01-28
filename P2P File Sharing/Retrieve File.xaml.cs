@@ -45,7 +45,7 @@ namespace P2P_File_Sharing
                 }
                 else
                 {
-                    MessageBox.Show("You haven't saved any files yet.", "No Saved Files", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    MessageBox.Show("There are no saved files.", "No Saved Files", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                     return false;
                 }
 
@@ -62,34 +62,40 @@ namespace P2P_File_Sharing
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //TODO Refactor
-            var filename = lbStoredFiles.SelectedItem.ToString();
-            if (filename != null && savedFiles != null)
+            if (lbStoredFiles.SelectedItems.Count > 0)
             {
-                EFile fileDetails = LoadData(filename);
-                fileDetails.FileName += ".aes";
-                var decryptFile = new FileEncryptor(fileDetails);
-                if (!decryptFile.IsAlreadyEncrypted())
+                var filename = lbStoredFiles.SelectedItem.ToString();
+                if (filename != null && savedFiles != null)
                 {
-                    MessageBox.Show("The file isn't encrypted.", "File Already Encrypted", MessageBoxButton.OK);
-                    StatusMessage.PostToActivityBox("Cannot decrypt file: The file was already decrypted", MessageType.ERROR);
-                }
+                    EFile fileDetails = LoadData(filename);
+                    fileDetails.FileName += ".aes";
+                    var decryptFile = new FileEncryptor(fileDetails);
+                    if (!decryptFile.IsAlreadyEncrypted())
+                    {
+                        MessageBox.Show("The file isn't encrypted.", "File Already Encrypted", MessageBoxButton.OK);
+                        StatusMessage.PostToActivityBox("Cannot decrypt file: The file was already decrypted", MessageType.ERROR);
+                    }
 
-                try
-                {
-                    decryptFile.FileDecrypt();
-                    DBController.UpdateDBState(fileDetails.FileHash, "false");
-                    DBController.RemoveSavedFile(fileDetails.FileHash);
-                    ContainsSavedFiles();
-                    StatusMessage.PostToActivityBox("File retrieved.", MessageType.INFORMATION);
-                    MessageBox.Show("File has been successfully retireved!", "File Retrieved", MessageBoxButton.OK, MessageBoxImage.Information);
+                    try
+                    {
+                        decryptFile.FileDecrypt();
+                        DBController.UpdateDBState(fileDetails.FileHash, "false");
+                        DBController.RemoveSavedFile(fileDetails.FileHash);
+                        ContainsSavedFiles();
+                        MessageBox.Show("File has been successfully retireved!", "File Retrieved", MessageBoxButton.OK, MessageBoxImage.Information);
+                        StatusMessage.PostToActivityBox("File retrieved.", MessageType.INFORMATION);
+                    }
+                    catch (Exception decryptEx)
+                    {
+                        StatusMessage.PostToActivityBox("Failed to decrypt file!", MessageType.ERROR);
+                        var logger = new StatusMessage();
+                        logger.Log($"Retrieve File Button: {decryptEx}");
+                    }
                 }
-                catch (Exception decryptEx)
-                {
-                    StatusMessage.PostToActivityBox("Failed to decrypt file!", MessageType.ERROR);
-                    var logger = new StatusMessage();
-                    logger.Log($"Retrieve File Button: {decryptEx}");
-                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a file to retrieve!", "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

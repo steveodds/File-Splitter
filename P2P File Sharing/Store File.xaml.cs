@@ -20,12 +20,25 @@ namespace P2P_File_Sharing
         private void BtnSaveFileSAVE_Click(object sender, RoutedEventArgs e)
         {
             var filename = PickFile();
+            if (string.IsNullOrEmpty(filename))
+            {
+                MessageBox.Show("Please pick a file!", "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+                SaveFile(filename);
+            }
+
+        }
+
+        private static void SaveFile(string filename)
+        {
             var fileDetails = new FileInfo(filename);
             var fileObject = new EFile(fileDetails);
             var temp = DBController.ReadFileDetails(fileObject.FileLocation).FileName;
             if (fileObject.FileLocation != temp)
             {
-                DBController.WriteToDB("files", fileObject);
+                SaveToDBFiles(fileObject);
                 var encryptFile = new FileEncryptor(fileObject);
                 try
                 {
@@ -47,7 +60,14 @@ namespace P2P_File_Sharing
             {
                 MessageBox.Show("Error, file was already saved.", "Error encrypting file", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            
+        }
+
+        private static void SaveToDBFiles(EFile fileObject)
+        {
+            if (!DBController.ContainsPreviousRecord(fileObject.FileLocation))
+            {
+                DBController.WriteToDB("files", fileObject);
+            }
         }
 
         private string PickFile()
